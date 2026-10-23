@@ -1,3 +1,4 @@
+<?php exit; ?>
 {
   "updated_at": "",
   "period": "",

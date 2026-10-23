@@ -1,0 +1,328 @@
+/* «تواصل معنا» (contact). Mobile-first, logical properties, scoped to .tpl-contact. */
+
+/* ---------- Hero ---------- */
+.tpl-contact .ct-hero .page-hero__aside { display: none; }
+@media (min-width: 960px) {
+  .tpl-contact .ct-hero .page-hero__aside { display: block; }
+}
+.tpl-contact .ct-hero-art { max-inline-size: 400px; margin-inline: auto; }
+.tpl-contact .ct-hero-art svg { inline-size: 100%; block-size: auto; overflow: visible; }
+.tpl-contact .ct-hero-art__bubble { animation: ct-float 5s ease-in-out infinite; }
+.tpl-contact .ct-hero-art__phone { animation: ct-float 5s ease-in-out 1.2s infinite; }
+.tpl-contact .ct-hero-art__win { animation: ct-glow 4s ease-in-out infinite; }
+@keyframes ct-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes ct-glow {
+  0%, 100% { fill: #EFA927; }
+  50% { fill: #F8C25A; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tpl-contact .ct-hero-art__bubble,
+  .tpl-contact .ct-hero-art__phone,
+  .tpl-contact .ct-hero-art__win { animation: none; }
+}
+
+/* ---------- Official channels ---------- */
+.tpl-contact .ct-channels { padding-block-start: clamp(2.5rem, 2rem + 3vw, 4.5rem); }
+.tpl-contact .ct-channels .section-head { margin-block-end: clamp(1.25rem, 1rem + 1.5vw, 2rem); }
+
+/* The two official numbers */
+.tpl-contact .ct-lines { display: grid; gap: 1rem; }
+@media (min-width: 900px) {
+  .tpl-contact .ct-lines--two { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+}
+.tpl-contact .ct-line {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: clamp(1.1rem, 0.8rem + 1.4vw, 2rem);
+  padding-block-start: calc(clamp(1.1rem, 0.8rem + 1.4vw, 2rem) + 4px);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.tpl-contact .ct-line::before {
+  /* roof line, as on the home tiles */
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  block-size: 5px;
+  background: var(--blue);
+}
+.tpl-contact .ct-line--legal::before { background: var(--amber); }
+
+.tpl-contact .ct-line__head { display: flex; align-items: flex-start; gap: 0.9rem; }
+.tpl-contact .ct-line__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 52px;
+  block-size: 52px;
+  border-radius: 18px 18px 10px 10px;
+  background: var(--blue);
+  color: var(--white);
+  box-shadow: 0 10px 22px -12px rgba(25, 132, 192, 0.9);
+}
+.tpl-contact .ct-line__icon .icon { inline-size: 26px; block-size: 26px; }
+.tpl-contact .ct-line--legal .ct-line__icon { background: var(--amber); color: var(--ink); box-shadow: 0 10px 22px -12px rgba(239, 169, 39, 0.95); }
+.tpl-contact .ct-line__label { font-size: var(--fs-md); font-weight: 800; line-height: 1.5; color: var(--ink); }
+.tpl-contact .ct-line__hint { margin-block-start: 0.2rem; color: var(--slate); font-size: var(--fs-sm); line-height: 1.7; }
+
+.tpl-contact .ct-line__num {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+  padding-block: 0.15rem;
+}
+.tpl-contact .ct-line__digits {
+  font-size: clamp(1.8rem, 1.3rem + 2.2vw, 2.85rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--blue);
+}
+.tpl-contact .ct-line--legal .ct-line__digits { color: var(--blue-700); }
+.tpl-contact .ct-line__extra {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-block-start: -0.5rem;
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+.tpl-contact .ct-line__extra .icon { color: var(--wa-dark); inline-size: 1.15em; block-size: 1.15em; }
+
+/* Copy button (shown by site.js only when the clipboard is available) */
+.tpl-contact .ct-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  min-block-size: 44px;
+  padding: 0.3em 0.95em;
+  border: 1.5px solid var(--line-2);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  color: var(--blue-700);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  line-height: 1.2;
+  transition: border-color 0.2s var(--ease), background-color 0.2s var(--ease);
+}
+.tpl-contact .ct-copy:hover { border-color: var(--blue-700); background: var(--blue-50); }
+.tpl-contact .ct-copy .icon { inline-size: 1.05em; block-size: 1.05em; }
+.tpl-contact .ct-copy[hidden] { display: none; }
+
+.tpl-contact .ct-line__actions {
+  display: grid;
+  gap: 0.65rem;
+  margin-block-start: auto;
+  padding-block-start: 0.25rem;
+}
+.tpl-contact .ct-line__actions .btn { inline-size: 100%; }
+.tpl-contact .ct-line__more { min-block-size: 48px; }
+@media (min-width: 560px) {
+  .tpl-contact .ct-line__actions { display: flex; flex-wrap: wrap; align-items: center; }
+  .tpl-contact .ct-line__actions .btn { inline-size: auto; }
+}
+
+/* Only one official number is set: lay the card out in two columns */
+@media (min-width: 900px) {
+  .tpl-contact .ct-lines:not(.ct-lines--two) .ct-line {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem 2.5rem;
+  }
+  .tpl-contact .ct-lines:not(.ct-lines--two) .ct-line__head { grid-row: 1 / span 3; }
+  .tpl-contact .ct-lines:not(.ct-lines--two) .ct-line__num,
+  .tpl-contact .ct-lines:not(.ct-lines--two) .ct-line__extra,
+  .tpl-contact .ct-lines:not(.ct-lines--two) .ct-line__actions { grid-column: 2; margin: 0; }
+}
+
+/* Address, email, social pages, hours */
+.tpl-contact .ct-cards { display: grid; gap: 1rem; margin-block-start: 1rem; }
+@media (min-width: 900px) {
+  .tpl-contact .ct-cards { margin-block-start: 1.25rem; gap: 1.25rem; }
+  .tpl-contact .ct-cards--2, .tpl-contact .ct-cards--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tpl-contact .ct-cards--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.tpl-contact .ct-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 1.15rem 1.2rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.tpl-contact .ct-card__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 46px;
+  block-size: 46px;
+  border-radius: 16px 16px 9px 9px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  color: var(--blue);
+}
+.tpl-contact .ct-card__icon .icon { inline-size: 22px; block-size: 22px; }
+.tpl-contact .ct-card__body { display: grid; gap: 0.2rem; min-inline-size: 0; }
+.tpl-contact .ct-card__body p + p { margin-block-start: 0; }
+.tpl-contact .ct-card__label { color: var(--slate); font-size: var(--fs-sm); font-weight: 700; line-height: 1.6; }
+.tpl-contact .ct-card__value { color: var(--ink); font-size: var(--fs-md); font-weight: 700; line-height: 1.65; }
+.tpl-contact .ct-card__value--email { overflow-wrap: anywhere; }
+.tpl-contact .ct-card__value a { color: var(--blue-700); text-decoration: none; }
+.tpl-contact .ct-card__value a:hover { text-decoration: underline; }
+.tpl-contact .ct-card__detail { color: var(--ink-2); font-size: var(--fs-sm); }
+.tpl-contact .ct-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  justify-self: start;
+  min-block-size: 44px;
+  color: var(--blue-700);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+.tpl-contact .ct-card__link:hover { text-decoration: underline; }
+.tpl-contact .ct-card__link .icon { inline-size: 1.05em; block-size: 1.05em; }
+
+/* A single detail card (e.g. only the address is set) reads as one wide strip */
+@media (min-width: 720px) {
+  .tpl-contact .ct-cards--1 .ct-card { align-items: center; padding: 1.1rem 1.5rem; }
+  .tpl-contact .ct-cards--1 .ct-card__body { grid-template-columns: auto 1fr auto; align-items: center; gap: 0.25rem 1.25rem; inline-size: 100%; }
+  .tpl-contact .ct-cards--1 .ct-card__label { grid-column: 1 / -1; }
+  .tpl-contact .ct-cards--1 .ct-card__value { grid-column: 1; }
+  .tpl-contact .ct-cards--1 .ct-card__detail { grid-column: 2; }
+  .tpl-contact .ct-cards--1 .ct-card__link,
+  .tpl-contact .ct-cards--1 .ct-social { grid-column: 3; grid-row: 1 / span 2; justify-self: end; }
+}
+
+.tpl-contact .ct-social { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-start: 0.35rem; }
+.tpl-contact .ct-social__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-block-size: 44px;
+  padding: 0.35em 1em;
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  border: 1.5px solid var(--line-2);
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+.tpl-contact .ct-social__link .icon { inline-size: 1.15em; block-size: 1.15em; color: var(--blue); }
+.tpl-contact .ct-social__link:hover { border-color: var(--blue-700); color: var(--blue-700); }
+
+/* ---------- WhatsApp composer ---------- */
+.tpl-contact .ct-compose__grid { display: grid; gap: clamp(1.75rem, 1rem + 3vw, 4rem); align-items: start; }
+@media (min-width: 960px) {
+  .tpl-contact .ct-compose__grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
+  .tpl-contact .ct-compose__intro { position: sticky; inset-block-start: calc(var(--header-h) + 2rem); }
+}
+.tpl-contact .ct-compose__intro .section-lead { max-inline-size: 52ch; }
+
+.tpl-contact .ct-howto { display: grid; gap: 0.7rem; margin-block-start: 1.5rem; }
+.tpl-contact .ct-howto__step {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius);
+  background: var(--white);
+  border: 1px solid var(--line);
+}
+.tpl-contact .ct-howto__num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 34px;
+  block-size: 34px;
+  border-radius: 12px 12px 6px 6px;
+  background: var(--amber);
+  color: var(--ink);
+  font-weight: 800;
+  line-height: 1;
+}
+.tpl-contact .ct-howto__step p { padding-block-start: 0.2rem; color: var(--ink-2); font-weight: 600; line-height: 1.7; }
+
+.tpl-contact .ct-compose__note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-block-start: 1rem;
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  line-height: 1.75;
+}
+.tpl-contact .ct-compose__note .icon { flex: none; margin-block-start: 0.2em; color: var(--amber-800); }
+.tpl-contact .ct-compose__privacy { display: flex; align-items: center; gap: 0.5rem; margin-block-start: 0.5rem; font-size: var(--fs-sm); }
+.tpl-contact .ct-compose__privacy .icon { flex: none; color: var(--blue-700); }
+.tpl-contact .ct-compose__privacy a { display: inline-flex; align-items: center; min-block-size: 44px; font-weight: 700; }
+
+.tpl-contact .ct-compose__card {
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.tpl-contact .ct-compose__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem clamp(1.25rem, 1rem + 1.5vw, 2rem);
+  background: linear-gradient(135deg, var(--blue-700), var(--blue-800));
+  color: var(--white);
+}
+.tpl-contact .ct-compose__avatar {
+  flex: none;
+  inline-size: 44px;
+  block-size: 44px;
+  padding: 6px;
+  border-radius: 50%;
+  background: var(--white);
+}
+.tpl-contact .ct-compose__who { display: grid; line-height: 1.35; }
+.tpl-contact .ct-compose__who strong { font-size: var(--fs-base); font-weight: 800; }
+.tpl-contact .ct-compose__who .num { justify-self: start; color: var(--blue-100); font-size: var(--fs-sm); font-weight: 600; }
+.tpl-contact .ct-compose__wa { margin-inline-start: auto; inline-size: 28px; block-size: 28px; opacity: 0.9; }
+
+/* The section heading and lead already introduce the form: hide its own. */
+.tpl-contact .ct-compose .wa-form__title,
+.tpl-contact .ct-compose .wa-form__text { display: none; }
+.tpl-contact .ct-compose .wa-form {
+  padding-block-start: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+/* the main action of this page: a filled button */
+.tpl-contact .ct-compose .wa-form .btn {
+  --btn-bg: var(--blue-700);
+  --btn-fg: var(--white);
+  --btn-bd: transparent;
+  min-block-size: 56px;
+  font-size: var(--fs-md);
+  box-shadow: 0 10px 24px -14px rgba(21, 114, 166, 0.9);
+}
+.tpl-contact .ct-compose .wa-form .btn .icon { color: var(--white); }
+.tpl-contact .ct-compose .wa-form .btn:hover { --btn-bg: var(--blue-800); }
+
+/* ---------- FAQ ---------- */
+/* a white section after a tinted one keeps its top padding */
+.tpl-contact .section.ct-faq.ct-faq { padding-block-start: var(--section-y); }

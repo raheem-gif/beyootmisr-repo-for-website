@@ -59,6 +59,8 @@ EDITORIAL = [
     'قائمة المراجعة قبل إطلاق الموقع',
     '09 | شارك في الخير', '10 | تواصل معنا', '07 | حكايات من بيوت مصر', '03 | من نحن',
     '04 | ما نؤمن به — ميثاق بيوت مصر',
+    'تُدرج هنا بيانات جهة الإشهار',                   # "insert the registration details here" (developer note)
+    'الرسمية للنفع العام وتصاريح جمع التبرعات، بالنص المطابق',
 ]
 STORY_GUIDES = ['عنوان المشروع أو نوع التدخل', 'المريض.', 'نوع مشروع متناهي الصغر', 'صور التنفيذ قبل/أثناء/بعد',
                 'نوع الدعم التعليمي والنتيجة العامة', 'اسم المشروع العام وموقعه العام']
@@ -95,8 +97,9 @@ def norm(s):
 
 
 def squash(s):
-    # The PDF extraction splits words around diacritics, so compare without any spaces.
-    return re.sub(r'\s+', '', s)
+    # The PDF extraction splits words around diacritics and writes the lam-alef
+    # ligature (لا) as "ال" next to tanween, so compare without spaces, lam or alef.
+    return re.sub(r'[\sلا]+', '', s)
 
 
 def site_text():
@@ -117,11 +120,17 @@ def site_text():
 def main():
     site = site_text()
     missing, editorial, gray = [], 0, 0
+    dev_section = False
     for raw in open(SRC, encoding='utf-8'):
         m = re.match(r'\[([^|\]]*)\|[^\]]*\]\s?(.*)', raw.strip())
         if not m:
             continue
         color, text = m.group(1), m.group(2).strip()
+        if re.match(r'^(12|13) \|', text):
+            dev_section = True          # §12 instructions for the developer, §13 launch checklist
+        if dev_section or '[' in text or ']' in text:
+            editorial += 1               # bracketed placeholders are notes, not copy
+            continue
         words = [w for w in norm(text).split(' ') if re.search('[؀-ۿ]', w)]
         if len(words) < 3:
             continue
@@ -134,7 +143,12 @@ def main():
         n = norm(text)
         # strip the "01. " style numbering and bullets used in the document
         n = squash(re.sub(r'^\d+\s*', '', n))
-        if n not in site:
+        if n in site:
+            continue
+        # A line can hold the end of one sentence and the start of the next, which the
+        # site may show in separate cards: accept it when every sentence part is present.
+        parts = [squash(norm(x)) for x in re.split(r'[.؟]\s+', text) if len(norm(x).split(' ')) >= 3]
+        if not parts or any(part not in site for part in parts):
             missing.append(text)
     print(f'checked document lines; editorial skipped: {editorial}; gray notes skipped: {gray}; missing: {len(missing)}')
     for line in missing:

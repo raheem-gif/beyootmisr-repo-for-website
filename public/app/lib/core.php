@@ -88,6 +88,23 @@ function absolute_url(string $path = ''): string
 /* JSON storage                                                              */
 /* ------------------------------------------------------------------------ */
 
+/**
+ * First line of guarded JSON files. Content lives in "<name>.json.php" files so
+ * that, even on hosts that ignore .htaccess, requesting one over HTTP runs PHP
+ * and returns nothing (unpublished drafts never leak).
+ */
+const BM_JSON_GUARD = "<?php exit; ?>\n";
+
+/** Remove leading "<?php exit; ?>" guard line(s) from guarded JSON text. */
+function bm_json_strip_guard(string $raw): string
+{
+    while (strncmp($raw, '<?php', 5) === 0) {
+        $nl = strpos($raw, "\n");
+        $raw = $nl === false ? '' : (string) substr($raw, $nl + 1);
+    }
+    return $raw;
+}
+
 /** @return mixed */
 function bm_json_read(string $file, $default = [])
 {
@@ -95,7 +112,11 @@ function bm_json_read(string $file, $default = [])
         return $default;
     }
     $raw = file_get_contents($file);
-    if ($raw === false || trim($raw) === '') {
+    if ($raw === false) {
+        return $default;
+    }
+    $raw = bm_json_strip_guard($raw);
+    if (trim($raw) === '') {
         return $default;
     }
     $data = json_decode($raw, true);
@@ -105,14 +126,18 @@ function bm_json_read(string $file, $default = [])
     return $data;
 }
 
-/** Write JSON atomically (temp file + rename) so a failed save never truncates data. */
+/**
+ * Write JSON atomically (temp file + rename) so a failed save never truncates data.
+ * Files ending in ".php" get the guard line first.
+ */
 function bm_json_write(string $file, $data): void
 {
     $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     if ($json === false) {
         throw new RuntimeException('Could not encode JSON for ' . basename($file));
     }
-    bm_write_file($file, $json . "\n");
+    $guard = substr($file, -4) === '.php' ? BM_JSON_GUARD : '';
+    bm_write_file($file, $guard . $json . "\n");
 }
 
 /** Atomic file write. */
@@ -132,11 +157,27 @@ function bm_write_file(string $file, string $contents): void
     }
 }
 
-/** Load a content collection from app/content/<name>.json (cached per request). */
+/** Path of a content file (always the guarded form; used for writing). */
+function bm_content_file(string $name): string
+{
+    return BM_CONTENT . '/' . $name . '.json.php';
+}
+
+/** Existing file to read for a content name: the guarded file, or a legacy plain .json. */
+function bm_content_source(string $name): string
+{
+    $file = bm_content_file($name);
+    if (!is_file($file) && is_file(BM_CONTENT . '/' . $name . '.json')) {
+        return BM_CONTENT . '/' . $name . '.json';
+    }
+    return $file;
+}
+
+/** Load a content collection from app/content/<name>.json.php (cached per request). */
 function bm_content(string $name)
 {
     if (!array_key_exists($name, $GLOBALS['bm_content_cache'] ?? [])) {
-        $GLOBALS['bm_content_cache'][$name] = bm_json_read(BM_CONTENT . '/' . $name . '.json', []);
+        $GLOBALS['bm_content_cache'][$name] = bm_json_read(bm_content_source($name), []);
     }
     return $GLOBALS['bm_content_cache'][$name];
 }
@@ -166,10 +207,21 @@ function t(string $key, array $vars = [])
         }
         $node = $node[$part];
     }
-    if (is_string($node)) {
-        return bm_fill($node, $vars);
+    return bm_fill_deep($node, $vars);
+}
+
+/** bm_fill() applied to every string inside a value (lists such as FAQ or privacy sections). */
+function bm_fill_deep($value, array $vars = [])
+{
+    if (is_string($value)) {
+        return bm_fill($value, $vars);
     }
-    return $node;
+    if (is_array($value)) {
+        foreach ($value as $k => $v) {
+            $value[$k] = bm_fill_deep($v, $vars);
+        }
+    }
+    return $value;
 }
 
 /** Escaped text, for direct output. */
@@ -359,6 +411,30 @@ function excerpt(string $text, int $chars = 160): string
     $cut = bm_substr($text, 0, $chars);
     $space = strrpos($cut, ' ');
     return rtrim($space !== false ? substr($cut, 0, $space) : $cut, '،,.؛ ') . '…';
+}
+
+/**
+ * A settings value that is still a placeholder from the content document
+ * (e.g. «[يُدرج بعد اعتماده]») counts as empty.
+ */
+function setting_text(string $v): string
+{
+    $v = trim($v);
+    return preg_match('/^[\[\]]|[\[\]]$/u', $v) ? '' : $v;
+}
+
+/** http(s) URL or ''. */
+function safe_url(string $v): string
+{
+    $v = setting_text($v);
+    return ($v !== '' && preg_match('#^https?://#i', $v) && filter_var($v, FILTER_VALIDATE_URL)) ? $v : '';
+}
+
+/** Valid e-mail address or ''. */
+function safe_email(string $v): string
+{
+    $v = setting_text($v);
+    return ($v !== '' && filter_var($v, FILTER_VALIDATE_EMAIL)) ? $v : '';
 }
 
 /** Build an HTML attribute string from an array. */

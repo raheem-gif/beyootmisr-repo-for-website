@@ -1,3 +1,4 @@
+<?php exit; ?>
 [
   {
     "id": "masjid-sayedna-isa-el-tor",

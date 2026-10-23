@@ -30,8 +30,10 @@ function brand_html(string $variant = ''): string
     $cls = 'brand' . ($variant !== '' ? ' brand--' . $variant : '');
     $label = t('site.name') . ' — ' . t('nav.home');
     if ($s['logo'] !== '' && $variant !== 'light') {
+        $size = @getimagesize(BM_PUBLIC . '/' . ltrim($s['logo'], '/'));
+        $dims = $size ? ' width="' . (int) round($size[0] * 52 / max(1, $size[1])) . '" height="52"' : ' height="52"';
         return '<a class="' . $cls . ' brand--image" href="' . e(u('index.html')) . '" aria-label="' . e($label) . '">'
-            . '<img src="' . e(upload_url($s['logo'])) . '" alt="' . e(t('site.full_name')) . '" height="52"></a>';
+            . '<img src="' . e(upload_url($s['logo'])) . '" alt="' . e(t('site.full_name')) . '"' . $dims . '></a>';
     }
     return '<a class="' . $cls . '" href="' . e(u('index.html')) . '" aria-label="' . e($label) . '">'
         . brand_mark()
@@ -150,10 +152,10 @@ function check_list(array $items, string $class = ''): string
     return $out . '</ul>';
 }
 
-/** Numbered steps (e.g. «إحنا معاكي» steps). */
-function steps(array $items): string
+/** Numbered steps (e.g. «إحنا معاكي» steps). $class adds modifiers such as "steps--row". */
+function steps(array $items, string $class = ''): string
 {
-    $out = '<ol class="steps" role="list">';
+    $out = '<ol class="steps' . ($class !== '' ? ' ' . e($class) : '') . '" role="list">';
     foreach (array_values($items) as $i => $item) {
         $out .= '<li class="step"><span class="step__num" aria-hidden="true">' . ($i + 1) . '</span><p>' . e((string) $item) . '</p></li>';
     }
@@ -317,15 +319,17 @@ function stat_grid(array $items, array $o = []): string
  */
 function img_tag(array $img, array $o = []): string
 {
+    $alt = trim((string) $img['alt']) !== '' ? (string) $img['alt'] : (string) ($img['caption'] !== '' ? $img['caption'] : ($o['alt'] ?? ''));
     $a = [
         'src' => upload_url($img['thumb'] !== '' ? $img['thumb'] : $img['src']),
-        'alt' => (string) $img['alt'],
+        'alt' => $alt,
         'loading' => $o['loading'] ?? 'lazy',
         'decoding' => 'async',
         'class' => $o['class'] ?? null,
     ];
-    if ($img['thumb'] !== '' && $img['thumb'] !== $img['src']) {
-        $a['srcset'] = upload_url($img['thumb']) . ' 640w, ' . upload_url($img['src']) . ' 1600w';
+    // srcset only when a real thumbnail exists; widths come from the stored record.
+    if ($img['thumb'] !== '' && $img['thumb'] !== $img['src'] && (int) $img['w'] > 640) {
+        $a['srcset'] = upload_url($img['thumb']) . ' 640w, ' . upload_url($img['src']) . ' ' . (int) $img['w'] . 'w';
         $a['sizes'] = $o['sizes'] ?? '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw';
     }
     if (!empty($img['w']) && !empty($img['h'])) {
@@ -403,7 +407,7 @@ function gallery(array $images, array $o = []): string
     $out = '<ul class="gallery" role="list" data-lightbox="' . e($group) . '">';
     foreach ($images as $img) {
         $out .= '<li><a class="gallery__link" href="' . e(upload_url($img['src'])) . '" data-caption="' . e($img['caption'] !== '' ? $img['caption'] : $img['alt']) . '">'
-            . img_tag($img, ['sizes' => '(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw'])
+            . img_tag($img, ['sizes' => '(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw', 'alt' => (string) ($o['alt'] ?? '')])
             . '</a>' . ($img['caption'] !== '' ? '<p class="gallery__caption">' . e($img['caption']) . '</p>' : '') . '</li>';
     }
     return $out . '</ul>';

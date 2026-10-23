@@ -1,0 +1,681 @@
+/* «أنشطتنا ومبادراتنا» (template activities) and the ten activity pages (template activity).
+   Mobile-first, logical properties only, scoped under .tpl-activities / .tpl-activity. */
+
+/* ======================================================================== */
+/* Activities index                                                          */
+/* ======================================================================== */
+
+/* White sections that follow a tinted one keep their top padding
+   (the base rule removes it for any section that follows another). */
+.tpl-activities .section.section--tint + .section.acts-initiative { padding-block-start: var(--section-y); }
+
+/* ---------- Hero: «عشرة أبواب للعطاء» quick index ---------- */
+.tpl-activities .acts-hero .page-hero__inner { grid-template-columns: minmax(0, 1fr); }
+.tpl-activities .acts-hero .page-hero__aside { min-inline-size: 0; }
+
+/* Phones & tablets: one swipeable row of chips */
+.tpl-activities .acts-doors__roof,
+.tpl-activities .acts-doors__ground { display: none; }
+.tpl-activities .acts-doors__list {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  margin-inline: calc(-1 * var(--gutter));
+  margin-block: -8px;
+  padding: 8px var(--gutter);
+  scroll-padding-inline: var(--gutter);
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.tpl-activities .acts-doors__list::-webkit-scrollbar { display: none; }
+.tpl-activities .acts-doors__list li { flex: none; scroll-snap-align: start; }
+.tpl-activities .acts-door {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-block-size: 48px;
+  padding-block: 0.3rem;
+  padding-inline: 0.35rem 1.05rem;
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  border: 1px solid var(--line-2);
+  box-shadow: var(--shadow-xs);
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  line-height: 1.3;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.2s var(--ease), color 0.2s var(--ease), background-color 0.2s var(--ease);
+}
+.tpl-activities .acts-door__arch {
+  display: grid;
+  place-items: center;
+  inline-size: 36px;
+  block-size: 36px;
+  border-radius: 18px 18px 8px 8px;
+  background: var(--blue-50);
+  color: var(--blue);
+  transition: background-color 0.25s var(--ease), color 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.tpl-activities .acts-door__arch .icon { inline-size: 19px; block-size: 19px; }
+.tpl-activities .acts-door:hover { border-color: var(--blue-700); color: var(--blue-700); background: var(--blue-50); }
+.tpl-activities .acts-door:hover .acts-door__arch { background: var(--blue); color: var(--white); }
+
+/* Desktop: a house façade with ten arched doors */
+@media (min-width: 960px) {
+  .tpl-activities .acts-hero .page-hero__inner { grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr); gap: clamp(2.5rem, 1rem + 3vw, 4.5rem); }
+  .tpl-activities .acts-hero .page-hero__deco { display: none; } /* the façade replaces the window pattern */
+  .tpl-activities .acts-doors {
+    position: relative;
+    padding-block-start: 30px;
+    max-inline-size: 500px;
+    margin-inline-start: auto;
+  }
+  .tpl-activities .acts-doors__roof {
+    display: block;
+    position: absolute;
+    inset-block-start: 16px;
+    inset-inline: -10px;
+    block-size: 18px;
+    border-radius: 6px;
+    background: var(--blue-800);
+  }
+  .tpl-activities .acts-doors__roof::before,
+  .tpl-activities .acts-doors__roof::after {
+    content: "";
+    position: absolute;
+    inset-block-end: 100%;
+    inline-size: 46px;
+    block-size: 14px;
+    border-radius: 5px 5px 0 0;
+    background: var(--blue-800);
+  }
+  .tpl-activities .acts-doors__roof::before { inset-inline-start: 30px; }
+  .tpl-activities .acts-doors__roof::after { inset-inline-end: 30px; }
+  .tpl-activities .acts-doors__list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1.35rem 0.8rem;
+    overflow: visible;
+    margin: 0;
+    padding: 1.9rem 1.2rem 1.5rem;
+    border-radius: 0 0 4px 4px;
+    background:
+      radial-gradient(260px 160px at 50% 0%, rgba(255, 255, 255, 0.08), transparent 70%),
+      var(--blue-700);
+    box-shadow: var(--shadow-lg);
+  }
+  .tpl-activities .acts-doors__list li { scroll-snap-align: none; }
+  .tpl-activities .acts-door {
+    flex-direction: column;
+    gap: 0.5rem;
+    inline-size: 100%;
+    min-block-size: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: none;
+    box-shadow: none;
+    color: var(--white);
+    font-size: var(--fs-xs);
+    text-align: center;
+    white-space: normal;
+  }
+  .tpl-activities .acts-door__arch {
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 4 / 5;
+    border-radius: 999px 999px 5px 5px;
+    background: var(--blue-800);
+    color: var(--blue-200);
+    box-shadow: inset 0 -5px 0 rgba(11, 68, 102, 0.55);
+  }
+  .tpl-activities .acts-door__arch .icon { inline-size: 44%; block-size: auto; aspect-ratio: 1; }
+  /* a few windows already lit, like the homes in the hero illustration */
+  .tpl-activities .acts-doors__list li:nth-child(1) .acts-door__arch,
+  .tpl-activities .acts-doors__list li:nth-child(4) .acts-door__arch,
+  .tpl-activities .acts-doors__list li:nth-child(5) .acts-door__arch,
+  .tpl-activities .acts-doors__list li:nth-child(7) .acts-door__arch,
+  .tpl-activities .acts-doors__list li:nth-child(10) .acts-door__arch {
+    background: var(--amber);
+    color: var(--ink);
+    box-shadow: inset 0 -5px 0 rgba(143, 93, 5, 0.25), 0 0 18px -2px rgba(239, 169, 39, 0.55);
+    animation: acts-light-up 0.7s var(--ease) both;
+    animation-delay: calc(0.3s + var(--i, 0) * 0.12s);
+  }
+  .tpl-activities .acts-door:hover,
+  .tpl-activities .acts-door:focus-visible { background: none; color: var(--amber-100); }
+  .tpl-activities .acts-door:hover .acts-door__arch,
+  .tpl-activities .acts-door:focus-visible .acts-door__arch {
+    background: var(--amber-300);
+    color: var(--ink);
+    transform: translateY(-3px);
+  }
+  .tpl-activities .acts-door:focus-visible { outline-offset: 4px; }
+  .tpl-activities .acts-doors__ground {
+    display: block;
+    block-size: 14px;
+    margin-inline: -26px;
+    border-radius: 0 0 10px 10px;
+    background: var(--blue-100);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tpl-activities .acts-doors__list li:nth-child(n) .acts-door__arch { animation: none; }
+}
+@keyframes acts-light-up {
+  0% { background: var(--blue-800); color: var(--blue-200); }
+  60% { background: #FFE3A3; }
+  100% { background: var(--amber); color: var(--ink); }
+}
+
+/* ---------- The ten activities ---------- */
+.tpl-activities .acts-list .section-head { margin-block-end: clamp(1.5rem, 1rem + 1.5vw, 2.25rem); }
+.tpl-activities .acts-list .section-title::after {
+  content: "";
+  display: block;
+  inline-size: 56px;
+  block-size: 5px;
+  margin-block-start: 0.85rem;
+  border-radius: 5px;
+  background: var(--amber);
+}
+.tpl-activities .acts-grid { display: grid; gap: 1rem; }
+@media (min-width: 960px) {
+  .tpl-activities .acts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+}
+.tpl-activities .acts-grid > li { display: flex; min-inline-size: 0; }
+
+.tpl-activities .act-card {
+  position: relative;
+  flex: 1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "door head" "body body";
+  gap: 1.1rem 1rem;
+  align-items: center;
+  padding: 1.25rem 1.2rem 1.2rem;
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-xs);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+.tpl-activities .act-card:hover,
+.tpl-activities .act-card:focus-within { transform: translateY(-4px); box-shadow: var(--shadow); border-color: var(--blue-200); }
+.tpl-activities .act-card:target { border-color: var(--amber); box-shadow: 0 0 0 4px rgba(239, 169, 39, 0.3), var(--shadow); }
+
+.tpl-activities .act-card__door {
+  grid-area: door;
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 64px;
+  block-size: 80px;
+  margin-block-end: 6px;
+  border-radius: 999px 999px 10px 10px;
+  background: var(--blue-50);
+  color: var(--blue);
+  transition: background-color 0.25s var(--ease), color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.tpl-activities .act-card__door > .icon { inline-size: 30px; block-size: 30px; margin-block-start: 4px; }
+.tpl-activities .act-card__plate {
+  position: absolute;
+  inset-block-end: -10px;
+  inset-inline: 0;
+  margin-inline: auto;
+  inline-size: max-content;
+  padding-inline: 0.55em;
+  border-radius: 7px;
+  background: var(--amber);
+  color: var(--ink);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  line-height: 1.65;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 3px var(--white);
+}
+.tpl-activities .act-card:hover .act-card__door,
+.tpl-activities .act-card:focus-within .act-card__door {
+  background: linear-gradient(180deg, var(--blue) 55%, var(--blue-700));
+  color: var(--white);
+  box-shadow: 0 10px 22px -12px rgba(25, 132, 192, 0.9);
+}
+
+.tpl-activities .act-card__head { grid-area: head; min-inline-size: 0; }
+.tpl-activities .act-card__title { font-size: var(--fs-xl); }
+.tpl-activities .act-card__title a { color: var(--ink); text-decoration: none; }
+.tpl-activities .act-card:hover .act-card__title a { color: var(--blue-700); }
+.tpl-activities .act-card__subtitle { margin-block-start: 0.2rem; color: var(--blue-700); font-weight: 700; font-size: var(--fs-sm); }
+
+.tpl-activities .act-card__body { grid-area: body; display: flex; flex-direction: column; gap: 0.85rem; align-self: stretch; min-inline-size: 0; }
+.tpl-activities .act-card__excerpt {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  line-height: 1.9;
+}
+.tpl-activities .act-card__tagline { font-size: var(--fs-base); }
+.tpl-activities .act-card__more {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.4rem;
+  margin-block-start: auto;
+  padding-block-start: 0.85rem;
+  border-block-start: 1px solid var(--line);
+  inline-size: 100%;
+  color: var(--blue-700);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+.tpl-activities .act-card__more .icon { inline-size: 1em; block-size: 1em; transition: transform 0.25s var(--ease); }
+.tpl-activities .act-card:hover .act-card__more .icon { transform: translateX(-4px); }
+
+@media (min-width: 560px) {
+  .tpl-activities .act-card {
+    grid-template-areas: "door head" "door body";
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    gap: 0.9rem 1.5rem;
+    padding: 1.6rem 1.6rem 1.4rem;
+  }
+  .tpl-activities .act-card__door { inline-size: 84px; block-size: 104px; }
+  .tpl-activities .act-card__door > .icon { inline-size: 38px; block-size: 38px; }
+  .tpl-activities .act-card__excerpt { display: block; overflow: visible; font-size: var(--fs-base); }
+}
+
+/* ---------- «مبادراتنا الخاصة» ---------- */
+.tpl-activities .acts-initiative__grid { display: grid; gap: 1.75rem; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 960px) {
+  .tpl-activities .acts-initiative__grid {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    grid-template-areas: "head card" "topics card";
+    grid-template-rows: auto 1fr;
+    gap: 0 clamp(2.5rem, 1rem + 4vw, 4.5rem);
+    align-items: center;
+  }
+  .tpl-activities .acts-initiative__head { grid-area: head; align-self: end; }
+  .tpl-activities .acts-initiative__card { grid-area: card; }
+  .tpl-activities .acts-initiative__topics { grid-area: topics; align-self: start; }
+}
+.tpl-activities .acts-initiative__tagline { margin-block-start: 1.1rem; font-size: var(--fs-lg); }
+.tpl-activities .acts-initiative__label { margin-block: 0 0.65rem; color: var(--slate); font-size: var(--fs-sm); font-weight: 700; }
+.tpl-activities .acts-initiative .chip { background: var(--surface); border-color: var(--line); }
+/* the section title above already reads «مبادراتنا الخاصة» */
+.tpl-activities .acts-initiative .initiative-card .eyebrow { display: none; }
+.tpl-activities .acts-initiative .initiative-card { transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease); }
+.tpl-activities .acts-initiative .initiative-card:hover,
+.tpl-activities .acts-initiative .initiative-card:focus-within { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+/* ======================================================================== */
+/* Activity page                                                             */
+/* ======================================================================== */
+
+.tpl-activity .section.section--tint + .section.act-contribute-wrap { padding-block: calc(var(--section-y) * 0.8); }
+.tpl-activity .act-more { padding-block-start: calc(var(--section-y) * 0.8); }
+
+/* ---------- Hero ---------- */
+.tpl-activity .act-hero .page-hero__inner { grid-template-columns: minmax(0, 1fr); }
+.tpl-activity .act-hero .page-hero__aside { display: none; }
+.tpl-activity .act-hero .page-subtitle { color: var(--ink-2); }
+.tpl-activity .act-hero .page-lead { margin-block-start: 1.25rem; }
+.tpl-activity .act-hero .page-lead p {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.7em;
+  color: var(--blue-700);
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  line-height: 1.55;
+}
+.tpl-activity .act-hero .page-lead p::before {
+  content: "";
+  flex: none;
+  inline-size: 5px;
+  align-self: stretch;
+  min-block-size: 1.3em;
+  border-radius: 5px;
+  background: var(--amber);
+}
+/* phones/tablets: icon tile and «نشاط 01» side by side */
+.tpl-activity .act-hero .page-hero__icon { vertical-align: middle; margin-inline-end: 0.85rem; }
+.tpl-activity .act-hero .page-hero__icon + .eyebrow { vertical-align: middle; margin-block-end: 1rem; }
+@media (min-width: 960px) {
+  .tpl-activity .act-hero .page-hero__inner { grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr); gap: 3rem; }
+  .tpl-activity .act-hero .page-hero__aside { display: block; }
+  .tpl-activity .act-hero .page-hero__icon { display: none; } /* the illustration carries the icon */
+  .tpl-activity .act-hero .page-hero__deco { display: none; }
+}
+
+/* Illustration: the activity as a home with a lit arched door */
+.tpl-activity .act-poster {
+  position: relative;
+  inline-size: min(100%, 380px);
+  aspect-ratio: 320 / 300;
+  margin-inline: auto;
+}
+.tpl-activity .act-poster__art { inline-size: 100%; block-size: 100%; overflow: visible; }
+.tpl-activity .act-poster__num { font-family: var(--font); font-size: 22px; font-weight: 800; fill: var(--blue-700); }
+.tpl-activity .act-poster__icon {
+  position: absolute;
+  inset-inline: 36.875%;
+  inset-block: 45.33% 10.67%;
+  display: grid;
+  place-items: center;
+  color: var(--blue-800);
+}
+.tpl-activity .act-poster__icon .icon { inline-size: 56%; block-size: auto; aspect-ratio: 1; stroke-width: 1.75; }
+
+/* ---------- Intro: تعريف مختصر + أنواع المساعدات ---------- */
+.tpl-activity .act-intro__grid { display: grid; gap: 2.25rem; align-items: start; }
+@media (min-width: 960px) {
+  .tpl-activity .act-intro__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2.5rem, 1rem + 4vw, 4.5rem); }
+}
+.tpl-activity .act-about .section-title::after {
+  content: "";
+  display: block;
+  inline-size: 56px;
+  block-size: 5px;
+  margin-block-start: 0.85rem;
+  border-radius: 5px;
+  background: var(--amber);
+}
+.tpl-activity .act-about__text { margin-block-start: 1.35rem; color: var(--ink-2); font-size: var(--fs-md); line-height: 2; }
+@media (min-width: 960px) {
+  .tpl-activity .act-about { padding-block-start: 0.5rem; }
+  .tpl-activity .act-about__text { font-size: var(--fs-lg); }
+}
+
+.tpl-activity .act-assist {
+  padding: clamp(1.25rem, 0.9rem + 1.6vw, 2rem);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.tpl-activity .act-assist__title { display: flex; align-items: center; gap: 0.75rem; margin-block-end: 1.15rem; font-size: var(--fs-xl); }
+.tpl-activity .act-assist__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 46px;
+  block-size: 46px;
+  border-radius: 16px 16px 8px 8px;
+  background: var(--blue);
+  color: var(--white);
+}
+.tpl-activity .act-assist__icon .icon { inline-size: 24px; block-size: 24px; }
+.tpl-activity .act-assist__list { gap: 0.6rem; counter-reset: assist; }
+.tpl-activity .act-assist__list li {
+  align-items: center;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-xs);
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.7;
+}
+.tpl-activity .act-assist__list .icon { margin-block-start: 0; background: var(--amber-50); color: var(--amber-800); }
+
+/* ---------- Documentation band: projects, photos, verified numbers ---------- */
+.tpl-activity .act-docs__inner { display: grid; gap: clamp(2.75rem, 1.75rem + 3vw, 4.25rem); }
+.tpl-activity .act-docs__row { display: grid; gap: 2.5rem 1.25rem; }
+@media (min-width: 720px) {
+  .tpl-activity .act-docs__row--2,
+  .tpl-activity .act-docs__row--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tpl-activity .act-docs__row--3 > :last-child { grid-column: 1 / -1; }
+}
+@media (min-width: 1024px) {
+  .tpl-activity .act-docs__row--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tpl-activity .act-docs__row--3 > :last-child { grid-column: auto; }
+}
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .tpl-activity .act-docs__row--3 .act-doc__title { font-size: var(--fs-lg); }
+}
+@media (min-width: 720px) {
+  /* titles and boxes line up across the row even when a title wraps */
+  .tpl-activity .act-docs__row > .act-doc { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0; }
+}
+.tpl-activity .act-doc { display: flex; flex-direction: column; min-inline-size: 0; }
+.tpl-activity .act-doc__title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-block-end: 1.1rem;
+  font-size: var(--fs-xl);
+}
+.tpl-activity .act-doc__title::before {
+  /* the brand's small lit window */
+  content: "";
+  flex: none;
+  inline-size: 12px;
+  block-size: 16px;
+  border-radius: 6px 6px 2px 2px;
+  background: var(--amber);
+}
+.tpl-activity .act-doc__body { flex: 1; display: flex; flex-direction: column; }
+.tpl-activity .act-doc__body > * { flex: 1; }
+.tpl-activity .act-doc__body > .stats-meta { flex: none; }
+.tpl-activity .act-doc .empty-state { align-content: center; padding-block: clamp(1.5rem, 1rem + 2.5vw, 2.5rem); border-color: var(--blue-200); background: rgba(255, 255, 255, 0.75); }
+.tpl-activity .act-doc .notice {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: clamp(1.75rem, 1rem + 3vw, 2.75rem) 1.25rem;
+  border-radius: var(--radius);
+  text-align: center;
+  font-size: var(--fs-base);
+}
+.tpl-activity .act-doc .notice > .icon {
+  inline-size: 56px;
+  block-size: 56px;
+  padding: 15px;
+  margin: 0;
+  border-radius: 50%;
+  background: var(--white);
+}
+.tpl-activity .act-doc .notice p { max-inline-size: 46ch; }
+
+/* Verified numbers keep a natural card width */
+.tpl-activity .act-doc .stats-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); align-content: start; }
+.tpl-activity .act-docs__row .act-doc .stats-grid { grid-template-columns: minmax(0, 1fr); align-content: stretch; }
+.tpl-activity .act-docs__row .stat { display: grid; align-content: center; justify-items: center; text-align: center; }
+
+/* Projects */
+.tpl-activity .act-projects { display: grid; gap: 1.25rem; }
+@media (min-width: 640px) { .tpl-activity .act-projects { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .tpl-activity .act-projects { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 720px) {
+  /* a single project gets a wide, horizontal card */
+  .tpl-activity .act-projects--single { grid-template-columns: minmax(0, 1fr); max-inline-size: 920px; }
+  .tpl-activity .act-projects--single .project-card { flex-direction: row; }
+  .tpl-activity .act-projects--single .card-media {
+    flex: 0 0 46%;
+    aspect-ratio: auto;
+    min-block-size: 260px;
+    border-radius: 0;
+    border-start-start-radius: var(--radius);
+    border-end-start-radius: var(--radius);
+  }
+  .tpl-activity .act-projects--single .project-card__body { justify-content: center; padding: 1.75rem 2rem; gap: 0.6rem; }
+  .tpl-activity .act-projects--single .project-card__title { font-size: var(--fs-xl); }
+  .tpl-activity .act-projects--single .project-card__foot { margin-block-start: 0.75rem; }
+}
+
+/* ---------- «ساهم في هذا النشاط» ---------- */
+.tpl-activity .act-contribute {
+  position: relative;
+  display: grid;
+  gap: 1.25rem 1.75rem;
+  align-items: center;
+  padding: clamp(1.5rem, 1rem + 2.5vw, 3rem);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--blue-700) 0%, var(--blue-900) 100%);
+  color: var(--white);
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: var(--shadow);
+}
+.tpl-activity .act-contribute::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -90px;
+  inset-inline-end: -70px;
+  inline-size: 300px;
+  block-size: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(239, 169, 39, 0.32), transparent 70%);
+  z-index: -1;
+}
+.tpl-activity .act-contribute__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 64px;
+  block-size: 64px;
+  border-radius: 22px 22px 12px 12px;
+  background: var(--amber);
+  color: var(--ink);
+}
+.tpl-activity .act-contribute__icon .icon { inline-size: 32px; block-size: 32px; }
+.tpl-activity .act-contribute .eyebrow { margin-block-end: 0.35rem; }
+.tpl-activity .act-contribute__title { color: var(--white); font-size: var(--fs-2xl); }
+.tpl-activity .act-contribute__text { margin-block-start: 0.65rem; color: var(--blue-100); font-size: var(--fs-md); max-inline-size: 62ch; }
+.tpl-activity .act-contribute__note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-block-start: 0.9rem;
+  color: var(--blue-100);
+  font-size: var(--fs-sm);
+  line-height: 1.75;
+}
+.tpl-activity .act-contribute__note .icon { flex: none; margin-block-start: 0.2em; color: var(--amber-300); }
+.tpl-activity .act-contribute__actions { flex-direction: column; align-items: stretch; }
+.tpl-activity .act-contribute__actions .btn { inline-size: 100%; }
+.tpl-activity .act-call .num { display: none; font-weight: 800; letter-spacing: 0.03em; color: var(--amber-300); }
+@media (min-width: 560px) {
+  .tpl-activity .act-call .num { display: inline; }
+}
+@media (min-width: 720px) {
+  .tpl-activity .act-contribute { grid-template-columns: auto minmax(0, 1fr); gap: 1.5rem 2rem; }
+  .tpl-activity .act-contribute__icon { align-self: start; }
+  .tpl-activity .act-contribute__actions { grid-column: 2; flex-direction: row; align-items: center; }
+  .tpl-activity .act-contribute__actions .btn { inline-size: auto; }
+}
+@media (min-width: 1200px) {
+  .tpl-activity .act-contribute { grid-template-columns: auto minmax(0, 1fr) auto; gap: 1.5rem 2.5rem; }
+  .tpl-activity .act-contribute__actions { grid-column: auto; flex-direction: column; align-items: stretch; min-inline-size: 300px; }
+  .tpl-activity .act-contribute__actions .btn { inline-size: 100%; }
+}
+
+/* ---------- Previous / next + other activities ---------- */
+.tpl-activity .act-pager { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.tpl-activity .act-pager__link {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+  min-inline-size: 0;
+  padding: 1rem 1.05rem;
+  border-radius: var(--radius);
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-xs);
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.tpl-activity .act-pager__link--next { align-items: flex-end; text-align: end; }
+.tpl-activity .act-pager__dir { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--slate); font-size: var(--fs-xs); font-weight: 700; }
+.tpl-activity .act-pager__dir .icon { inline-size: 1.05em; block-size: 1.05em; transition: transform 0.2s var(--ease); }
+.tpl-activity .act-pager__main { display: flex; align-items: center; gap: 0.7rem; min-inline-size: 0; }
+.tpl-activity .act-pager__link--next .act-pager__main { flex-direction: row-reverse; }
+.tpl-activity .act-pager__text { display: grid; gap: 0.1rem; min-inline-size: 0; }
+.tpl-activity .act-pager__name { font-size: var(--fs-md); font-weight: 800; line-height: 1.35; }
+.tpl-activity .act-pager__sub { color: var(--slate); font-size: var(--fs-xs); font-weight: 600; line-height: 1.5; }
+.tpl-activity .act-pager__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 42px;
+  block-size: 42px;
+  border-radius: 21px 21px 9px 9px;
+  background: var(--blue-50);
+  color: var(--blue);
+  transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+.tpl-activity .act-pager__icon .icon { inline-size: 22px; block-size: 22px; }
+.tpl-activity .act-pager__link:hover { border-color: var(--blue-200); box-shadow: var(--shadow); transform: translateY(-2px); color: var(--ink); }
+.tpl-activity .act-pager__link:hover .act-pager__dir { color: var(--blue-700); }
+.tpl-activity .act-pager__link:hover .act-pager__icon { background: var(--blue); color: var(--white); }
+.tpl-activity .act-pager__link--prev:hover .act-pager__dir .icon { transform: translateX(3px); }
+.tpl-activity .act-pager__link--next:hover .act-pager__dir .icon { transform: translateX(-3px); }
+@media (max-width: 479px) {
+  .tpl-activity .act-pager__icon { display: none; }
+  .tpl-activity .act-pager__name { font-size: var(--fs-base); }
+}
+@media (min-width: 720px) {
+  .tpl-activity .act-pager { gap: 1.25rem; }
+  .tpl-activity .act-pager__link { padding: 1.3rem 1.5rem; }
+  .tpl-activity .act-pager__name { font-size: var(--fs-lg); }
+  .tpl-activity .act-pager__icon { inline-size: 50px; block-size: 50px; border-radius: 25px 25px 10px 10px; }
+  .tpl-activity .act-pager__icon .icon { inline-size: 26px; block-size: 26px; }
+}
+
+.tpl-activity .act-others { margin-block-start: clamp(2.25rem, 1.5rem + 2.5vw, 3.5rem); }
+.tpl-activity .act-others__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-block-end: 1.1rem;
+}
+.tpl-activity .act-others__title { font-size: var(--fs-xl); }
+.tpl-activity .act-others__all { display: inline-flex; align-items: center; gap: 0.35rem; min-block-size: 44px; font-size: var(--fs-sm); font-weight: 700; text-decoration: none; }
+.tpl-activity .act-others__all:hover { text-decoration: underline; }
+.tpl-activity .act-others__all .icon { inline-size: 1em; block-size: 1em; }
+.tpl-activity .act-others__list { display: grid; gap: 0.6rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (min-width: 1024px) {
+  .tpl-activity .act-others__list { grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 0.7rem; }
+}
+.tpl-activity .act-others__list > li { display: flex; min-inline-size: 0; }
+.tpl-activity .act-other {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.95rem 0.4rem 0.85rem;
+  border-radius: var(--radius);
+  background: var(--white);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  text-decoration: none;
+  transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.tpl-activity .act-other__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 48px;
+  border-radius: 22px 22px 9px 9px;
+  background: var(--blue-50);
+  color: var(--blue);
+  transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+.tpl-activity .act-other__icon .icon { inline-size: 22px; block-size: 22px; }
+.tpl-activity .act-other:hover { border-color: var(--blue-200); box-shadow: var(--shadow-sm); transform: translateY(-3px); color: var(--blue-700); }
+.tpl-activity .act-other:hover .act-other__icon { background: var(--blue); color: var(--white); }

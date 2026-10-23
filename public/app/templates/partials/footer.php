@@ -7,9 +7,12 @@ defined('BM_APP') || exit;
 $s = bm_settings();
 $c = $s['contact'];
 $social = array_filter([
-    'facebook' => $s['social']['facebook'],
-    'instagram' => $s['social']['instagram'],
+    'facebook' => safe_url((string) $s['social']['facebook']),
+    'instagram' => safe_url((string) $s['social']['instagram']),
 ]);
+$c['address'] = setting_text((string) $c['address']);
+$c['address_detail'] = setting_text((string) $c['address_detail']);
+$c['email'] = safe_email((string) $c['email']);
 $hasLegal = $s['legal']['registration_number'] !== '' && $s['legal']['registration_year'] !== '';
 ?>
 <footer class="site-footer">

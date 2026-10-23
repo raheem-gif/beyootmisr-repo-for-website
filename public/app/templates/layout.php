@@ -58,9 +58,9 @@ $settings = bm_settings();
     'url' => absolute_url() ?: null,
     'logo' => absolute_url('assets/img/apple-touch-icon.png') ?: null,
     'telephone' => $settings['contact']['hotline'] !== '' ? '+' . intl_phone($settings['contact']['hotline']) : null,
-    'email' => $settings['contact']['email'] ?: null,
+    'email' => safe_email((string) $settings['contact']['email']) ?: null,
     'address' => $settings['contact']['address'] !== '' ? ['@type' => 'PostalAddress', 'streetAddress' => $settings['contact']['address'], 'addressCountry' => 'EG'] : null,
-    'sameAs' => array_values(array_filter([$settings['social']['facebook'], $settings['social']['instagram']])) ?: null,
+    'sameAs' => array_values(array_filter([safe_url((string) $settings['social']['facebook']), safe_url((string) $settings['social']['instagram'])])) ?: null,
 ]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script>
 <?php endif; ?>
 </head>

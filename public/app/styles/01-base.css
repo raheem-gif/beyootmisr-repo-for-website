@@ -10,7 +10,7 @@ html {
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
 body {
@@ -25,6 +25,8 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
+
+[hidden] { display: none !important; }
 
 img, svg, video { display: block; max-width: 100%; }
 img { height: auto; }
@@ -92,7 +94,7 @@ main:focus { outline: none; }
 .section--tint { background: var(--surface); }
 .section--blue { background: var(--blue-50); }
 .section--tight { padding-block: calc(var(--section-y) * 0.6); }
-.section + .section:not(.section--tint):not(.section--blue) { padding-block-start: 0; }
+:where(.section:not(.section--tint):not(.section--blue)) + .section:not(.section--tint):not(.section--blue) { padding-block-start: 0; }
 .section--tint + .section--tint, .section--blue + .section--blue { padding-block-start: 0; }
 
 .stack > * + * { margin-block-start: var(--stack, 1rem); }

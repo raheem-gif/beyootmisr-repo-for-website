@@ -599,9 +599,9 @@
 .page-hero__deco svg { inline-size: 100%; block-size: 100%; }
 .page-hero__deco .w { fill: var(--blue-100); }
 .page-hero__deco .w-lit { fill: var(--amber-100); }
-.page-hero__inner { display: grid; gap: 2rem; align-items: center; }
-@media (min-width: 960px) { .page-hero__inner:has(.page-hero__aside) { grid-template-columns: 1.2fr 0.8fr; } }
-.page-hero__content { max-inline-size: 780px; }
+.page-hero__inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; align-items: center; }
+@media (min-width: 960px) { .page-hero__inner:has(.page-hero__aside) { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); } }
+.page-hero__content { max-inline-size: 780px; min-inline-size: 0; }
 .page-hero .breadcrumb { margin-block-end: 1.25rem; }
 .page-hero__icon {
   display: inline-grid;

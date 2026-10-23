@@ -1,0 +1,272 @@
+/* مبادرة «إحنا معاكي» (template ehna-maaki).
+   Mobile-first, logical properties only, scoped under .tpl-ehna-maaki. */
+
+/* A white section that follows a tinted one keeps its top padding
+   (the base rule removes it for any section that follows another). */
+.tpl-ehna-maaki .section.section--tint + .section:not(.section--tint) { padding-block-start: var(--section-y); }
+
+/* ---------- Hero ---------- */
+.tpl-ehna-maaki .em-hero .page-hero__icon {
+  background: var(--amber);
+  color: var(--ink);
+  box-shadow: 0 10px 24px -10px rgba(239, 169, 39, 0.9);
+}
+/* icon and eyebrow share one line, centred on each other */
+.tpl-ehna-maaki .em-hero .page-hero__icon { vertical-align: middle; margin-inline-end: 0.85rem; }
+.tpl-ehna-maaki .em-hero .page-hero__icon + .eyebrow { vertical-align: middle; margin-block-end: 1rem; }
+.tpl-ehna-maaki .em-hero .page-subtitle { color: var(--ink); }
+.tpl-ehna-maaki .em-hero .page-hero__aside { display: none; }
+@media (min-width: 960px) {
+  .tpl-ehna-maaki .em-hero .page-hero__aside { display: block; }
+  .tpl-ehna-maaki .em-hero .page-hero__deco { display: none; } /* the illustration replaces the window pattern */
+}
+/* Phones: the long WhatsApp label fits on one line at the regular size */
+@media (max-width: 479px) {
+  .tpl-ehna-maaki .em-hero .actions .btn,
+  .tpl-ehna-maaki .em-steps__cta .btn { inline-size: 100%; padding-inline: 1em; font-size: var(--fs-base); }
+}
+.tpl-ehna-maaki .em-poster { max-inline-size: 380px; margin-inline: auto; }
+.tpl-ehna-maaki .em-poster__art { inline-size: 100%; block-size: auto; overflow: visible; }
+.tpl-ehna-maaki .em-poster__bubble { transform-box: fill-box; transform-origin: 20% 100%; animation: em-bubble 0.6s var(--ease) 0.4s both; }
+@keyframes em-bubble {
+  from { opacity: 0; transform: translateY(8px) scale(0.85); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------- Topics ---------- */
+.tpl-ehna-maaki .em-topics__grid { display: grid; gap: 1.5rem; }
+.tpl-ehna-maaki .em-topics .section-head { margin-block-end: 0; }
+.tpl-ehna-maaki .em-topics .section-title::after {
+  content: "";
+  display: block;
+  inline-size: 56px;
+  block-size: 5px;
+  margin-block-start: 0.85rem;
+  border-radius: 5px;
+  background: var(--amber);
+}
+@media (min-width: 960px) {
+  .tpl-ehna-maaki .em-topics__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2.5rem, 1rem + 4vw, 4.5rem); align-items: center; }
+}
+.tpl-ehna-maaki .em-topics__card {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.25rem, 1rem + 1.5vw, 2.25rem);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(160deg, var(--blue-50), var(--white) 85%);
+  border: 1px solid var(--blue-100);
+  isolation: isolate;
+}
+.tpl-ehna-maaki .em-topics__mark {
+  position: absolute;
+  inset-block-end: -18px;
+  inset-inline-end: -14px;
+  inline-size: 132px;
+  block-size: 132px;
+  color: var(--blue-100);
+  stroke-width: 1.5;
+  z-index: -1;
+}
+.tpl-ehna-maaki .em-topics .chips { gap: 0.6rem; }
+.tpl-ehna-maaki .em-topics .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  padding: 0.5em 1.05em;
+  border-color: var(--blue-200);
+  background: var(--white);
+  box-shadow: var(--shadow-xs);
+  color: var(--ink);
+  font-size: var(--fs-base);
+  font-weight: 700;
+  line-height: 1.5;
+}
+.tpl-ehna-maaki .em-topics .chip::before {
+  /* a small lit window — the brand motif */
+  content: "";
+  flex: none;
+  inline-size: 8px;
+  block-size: 11px;
+  border-radius: 4px 4px 2px 2px;
+  background: var(--amber);
+}
+
+/* ---------- What is free / what is assessed ---------- */
+.tpl-ehna-maaki .em-terms__grid { display: grid; gap: 1rem; max-inline-size: 1040px; margin-inline: auto; }
+@media (min-width: 720px) {
+  .tpl-ehna-maaki .em-terms__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+}
+.tpl-ehna-maaki .em-term {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-content: start;
+  align-items: center;
+  gap: 0.9rem 1rem;
+  padding: clamp(1.4rem, 1.1rem + 1.4vw, 2.1rem);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.tpl-ehna-maaki .em-term::before {
+  /* roof line */
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  block-size: 5px;
+  background: var(--blue);
+}
+.tpl-ehna-maaki .em-term__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 54px;
+  block-size: 54px;
+  border-radius: 18px 18px 9px 9px;
+  background: var(--blue);
+  color: var(--white);
+}
+.tpl-ehna-maaki .em-term__icon .icon { inline-size: 28px; block-size: 28px; }
+.tpl-ehna-maaki .em-term--free .em-term__icon .icon { stroke-width: 3; }
+.tpl-ehna-maaki .em-term__label { font-size: var(--fs-xl); color: var(--blue-700); }
+.tpl-ehna-maaki .em-term__text { grid-column: 1 / -1; font-size: var(--fs-md); line-height: 1.85; color: var(--ink-2); }
+.tpl-ehna-maaki .em-term--free .em-term__text { color: var(--ink); font-weight: 700; }
+
+.tpl-ehna-maaki .em-term--assessed { background: var(--amber-50); border-color: var(--amber-100); box-shadow: none; }
+.tpl-ehna-maaki .em-term--assessed::before { background: var(--amber); }
+.tpl-ehna-maaki .em-term--assessed .em-term__icon { background: var(--amber); color: var(--ink); }
+.tpl-ehna-maaki .em-term--assessed .em-term__label { color: var(--amber-800); }
+
+@media (min-width: 1024px) {
+  .tpl-ehna-maaki .em-term { grid-template-columns: auto minmax(0, 1fr); align-items: start; }
+  .tpl-ehna-maaki .em-term__icon { grid-row: span 2; inline-size: 60px; block-size: 60px; }
+  .tpl-ehna-maaki .em-term__label { align-self: center; }
+  .tpl-ehna-maaki .em-term__text { grid-column: 2; }
+}
+
+/* ---------- Steps ---------- */
+.tpl-ehna-maaki .em-steps__list { position: relative; gap: 1rem; max-inline-size: 640px; margin-inline: auto; }
+.tpl-ehna-maaki .em-steps__list::before {
+  /* the path connecting the steps (visible in the gaps between cards) */
+  content: "";
+  position: absolute;
+  inset-block: 1.5rem;
+  inset-inline-start: calc(1.2rem + 19px);
+  border-inline-start: 2px dashed var(--amber-300);
+}
+.tpl-ehna-maaki .em-steps .step { z-index: 1; align-items: center; }
+.tpl-ehna-maaki .em-steps .step p { padding-block-start: 0; font-weight: 600; color: var(--ink); line-height: 1.75; }
+.tpl-ehna-maaki .em-steps__cta { justify-content: center; margin-block-start: clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem); }
+@media (min-width: 900px) {
+  .tpl-ehna-maaki .em-steps__list.steps--row {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    max-inline-size: none;
+  }
+  .tpl-ehna-maaki .em-steps__list::before {
+    inset-block: calc(1.6rem + 24px) auto;
+    inset-inline: 12%;
+    border-inline-start: 0;
+    border-block-start: 2px dashed var(--amber-300);
+  }
+  .tpl-ehna-maaki .em-steps .step { align-items: flex-start; gap: 1.1rem; padding: 1.6rem 1.4rem 1.5rem; }
+  .tpl-ehna-maaki .em-steps .step__num { inline-size: 48px; block-size: 48px; border-radius: 16px 16px 8px 8px; font-size: var(--fs-lg); }
+  .tpl-ehna-maaki .em-steps .step:first-child .step__num { background: var(--blue); color: var(--white); }
+}
+
+/* ---------- Tagline band ---------- */
+.tpl-ehna-maaki .em-band {
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(3rem, 2rem + 4vw, 5.5rem);
+  background:
+    radial-gradient(700px 260px at 50% 110%, rgba(239, 169, 39, 0.22), transparent 70%),
+    var(--amber-50);
+  border-block: 1px solid var(--amber-100);
+  text-align: center;
+  isolation: isolate;
+}
+.tpl-ehna-maaki .em-band::before {
+  /* a tall lit arched window framing the words */
+  content: "";
+  position: absolute;
+  inset-block: clamp(1.25rem, 0.5rem + 2vw, 2rem) 0;
+  inset-inline: 0;
+  margin-inline: auto;
+  inline-size: min(940px, calc(100% - 2 * var(--gutter)));
+  border: 2px solid var(--amber-100);
+  border-block-end: 0;
+  border-radius: 470px 470px 0 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.35) 60%, rgba(255, 255, 255, 0) 100%);
+  z-index: -1;
+}
+.tpl-ehna-maaki .em-band__inner { position: relative; display: grid; justify-items: center; gap: 1.1rem; padding-block-start: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
+.tpl-ehna-maaki .em-band__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 60px;
+  block-size: 60px;
+  border-radius: 20px 20px 10px 10px;
+  background: var(--amber);
+  color: var(--ink);
+  box-shadow: 0 10px 24px -12px rgba(143, 93, 5, 0.6);
+}
+.tpl-ehna-maaki .em-band__icon .icon { inline-size: 30px; block-size: 30px; }
+.tpl-ehna-maaki .em-band__text {
+  max-inline-size: 36ch;
+  font-size: clamp(1.55rem, 1.05rem + 2.3vw, 2.6rem);
+  font-weight: 800;
+  line-height: 1.55;
+  text-wrap: balance;
+}
+.tpl-ehna-maaki .em-band__lead { display: block; color: var(--ink); }
+.tpl-ehna-maaki .em-band__promise { display: block; color: var(--blue); }
+
+/* ---------- Contact ---------- */
+.tpl-ehna-maaki .em-contact__panel {
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 0.9rem + 2vw, 2.5rem);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+@media (max-width: 559px) {
+  /* phones: no card around the cards */
+  .tpl-ehna-maaki .em-contact__panel { padding: 0; border: 0; background: none; box-shadow: none; }
+}
+.tpl-ehna-maaki .em-contact__head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.6rem 1rem; align-items: center; }
+.tpl-ehna-maaki .em-contact__note { grid-column: 1 / -1; }
+@media (min-width: 720px) {
+  .tpl-ehna-maaki .em-contact__note { grid-column: 2; }
+}
+.tpl-ehna-maaki .em-contact__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 52px;
+  block-size: 52px;
+  border-radius: 16px 16px 8px 8px;
+  background: var(--blue-50);
+  color: var(--blue);
+}
+.tpl-ehna-maaki .em-contact__icon .icon { inline-size: 26px; block-size: 26px; }
+.tpl-ehna-maaki .em-contact .section-title { font-size: var(--fs-xl); }
+.tpl-ehna-maaki .em-contact__note { color: var(--ink-2); font-size: var(--fs-md); max-inline-size: 70ch; }
+.tpl-ehna-maaki .em-contact__note a { font-weight: 800; text-decoration: none; white-space: nowrap; }
+.tpl-ehna-maaki .em-contact__note a:hover { text-decoration: underline; }
+/* On this page the initiative's own line comes first. */
+.tpl-ehna-maaki .em-contact .help-line--legal { order: -1; }
+.tpl-ehna-maaki .em-contact .help-line { display: flex; flex-direction: column; }
+.tpl-ehna-maaki .em-contact .help-line .actions { margin-block-start: auto; }
+@media (max-width: 399px) {
+  .tpl-ehna-maaki .em-contact .help-line .btn { flex: 1 1 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tpl-ehna-maaki .em-poster__bubble { animation: none; }
+}
