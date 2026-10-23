@@ -1,0 +1,12 @@
+# Runtime data written on the server by the admin panel
+/public/app/storage/*
+!/public/app/storage/index.html
+/public/uploads/images/*
+!/public/uploads/images/index.html
+/public/uploads/reports/*
+!/public/uploads/reports/index.html
+/public/app/content/*.tmp
+/dist/
+node_modules/
+.DS_Store
+Thumbs.db

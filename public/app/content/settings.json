@@ -1,0 +1,30 @@
+{
+  "site_url": "",
+  "logo": "",
+  "contact": {
+    "hotline": "01211114662",
+    "whatsapp_general": "01211114662",
+    "whatsapp_legal": "01070407088",
+    "address": "القاهرة — مدينة نصر — الحي العاشر",
+    "address_detail": "",
+    "email": "",
+    "hours": "",
+    "map_url": ""
+  },
+  "social": {
+    "facebook": "",
+    "instagram": ""
+  },
+  "legal": {
+    "registration_number": "11108",
+    "registration_year": "2020",
+    "registration_authority": "",
+    "public_benefit": "",
+    "fundraising_permit": ""
+  },
+  "donations": {
+    "enabled": false,
+    "methods": [],
+    "allocation_note": ""
+  }
+}

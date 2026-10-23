@@ -1,0 +1,14 @@
+{
+  "name": "مؤسسة بيوت مصر لدعم الأرامل والأيتام",
+  "short_name": "بيوت مصر",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "display": "browser",
+  "background_color": "#FFFFFF",
+  "theme_color": "#1984C0",
+  "icons": [
+    { "src": "assets/img/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "assets/img/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -1,0 +1,132 @@
+/* Home page */
+
+/* Hero */
+.home-hero {
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(2rem, 1rem + 4vw, 4.5rem) 0;
+  background:
+    radial-gradient(1200px 500px at 85% -10%, rgba(25, 132, 192, 0.10), transparent 60%),
+    linear-gradient(180deg, var(--blue-50) 0%, #F7FBFE 70%, var(--white) 100%);
+  isolation: isolate;
+}
+.home-hero__inner { display: grid; gap: 1.5rem; align-items: end; }
+@media (min-width: 960px) { .home-hero__inner { grid-template-columns: 1.05fr 0.95fr; gap: 2.5rem; } }
+.home-hero__content { padding-block-end: clamp(1rem, 0.5rem + 3vw, 4.5rem); }
+.home-hero .eyebrow { margin-block-end: 1rem; }
+.home-hero__title {
+  font-size: clamp(2.2rem, 1.4rem + 3.8vw, 4rem);
+  line-height: 1.25;
+  color: var(--blue);
+  letter-spacing: -0.01em;
+}
+.home-hero__title span { display: block; color: var(--ink); }
+.home-hero__text { margin-block-start: 1.25rem; font-size: clamp(1.1rem, 1rem + 0.45vw, 1.3rem); line-height: 1.9; color: var(--ink-2); max-inline-size: 58ch; }
+.home-hero .actions { margin-block-start: 1.75rem; }
+.home-hero__art { position: relative; margin-inline: -4%; margin-block-end: -1px; }
+.home-hero__art svg { overflow: visible; }
+.home-hero__art svg { inline-size: 100%; block-size: auto; }
+@media (max-width: 959px) { .home-hero__art { max-inline-size: 560px; margin-inline: auto; } }
+
+/* Skyline illustration */
+.skyline .dim { fill: var(--blue-800); }
+.skyline path.dim, .skyline rect.dim { fill: #2B6E98; }
+.skyline .lit { fill: var(--amber); animation: light-up 0.7s var(--ease) both; animation-delay: var(--d, 0s); }
+@keyframes light-up {
+  0% { fill: #2B6E98; }
+  60% { fill: #FFE3A3; }
+  100% { fill: var(--amber); }
+}
+
+/* Intro (تعريف قصير) */
+.intro-card {
+  position: relative;
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.5rem, 1rem + 2.5vw, 3rem);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+@media (min-width: 900px) { .intro-card { grid-template-columns: 1fr auto; align-items: center; gap: 3rem; } }
+.intro-card__text { font-size: var(--fs-md); color: var(--ink-2); }
+.intro-card .section-title { margin-block-end: 1rem; }
+.facts { display: grid; gap: 0.6rem; }
+.fact {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.fact .icon { color: var(--blue); }
+@media (max-width: 899px) { .fact { white-space: normal; } }
+
+/* كل بيت.. له حكاية */
+.homes { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
+.home-tile {
+  position: relative;
+  padding: 1.5rem 1.35rem 1.35rem;
+  border-radius: 22px 22px var(--radius) var(--radius);
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+}
+.home-tile::before {
+  /* roof line */
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  block-size: 5px;
+  background: var(--blue);
+}
+.home-tile:nth-child(2)::before { background: var(--amber); }
+.home-tile:nth-child(3)::before { background: var(--blue-400); }
+.home-tile:nth-child(4)::before { background: var(--blue-700); }
+.home-tile__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 50px;
+  block-size: 50px;
+  margin-block-end: 1rem;
+  border-radius: 16px 16px 8px 8px;
+  background: var(--blue-50);
+  color: var(--blue);
+}
+.home-tile__icon .icon { inline-size: 26px; block-size: 26px; }
+.home-tile p { font-size: var(--fs-md); font-weight: 700; color: var(--ink); line-height: 1.7; }
+.homes-closing { margin-block-start: 2rem; text-align: center; }
+.homes-closing .tagline { font-size: var(--fs-xl); }
+
+/* Activities on home */
+.activities-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); }
+.home-activities .initiative-card { margin-block-start: 1.25rem; }
+.home-activities__more { margin-block-start: 2rem; text-align: center; }
+
+/* Stories teaser */
+.stories-teaser { display: grid; gap: 2rem; align-items: center; }
+@media (min-width: 960px) { .stories-teaser { grid-template-columns: 0.9fr 1.1fr; gap: 4rem; } }
+.stories-teaser__art {
+  position: relative;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.story-kind {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: var(--white);
+  border: 1px solid var(--line);
+  font-weight: 700;
+}
+.story-kind .icon { color: var(--blue); flex: none; }
+.stories-teaser .notice { margin-block-start: 1.25rem; }
