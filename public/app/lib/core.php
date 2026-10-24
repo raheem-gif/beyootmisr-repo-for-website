@@ -177,9 +177,47 @@ function bm_content_source(string $name): string
 function bm_content(string $name)
 {
     if (!array_key_exists($name, $GLOBALS['bm_content_cache'] ?? [])) {
-        $GLOBALS['bm_content_cache'][$name] = bm_json_read(bm_content_source($name), []);
+        $data = bm_json_read(bm_content_source($name), []);
+        if ($name === 'texts') {
+            $data = bm_merge_texts(bm_texts_defaults(), $data);
+        }
+        $GLOBALS['bm_content_cache'][$name] = $data;
     }
     return $GLOBALS['bm_content_cache'][$name];
+}
+
+/** True for a JSON list ([...]) as opposed to an object ({...}). */
+function bm_is_list(array $a): bool
+{
+    return $a === [] || array_keys($a) === range(0, count($a) - 1);
+}
+
+/**
+ * Default texts shipped with a code update (app/lib/texts-defaults.json.php, written by
+ * tools/package.sh), or [] when the file is absent (development copies, full installs).
+ */
+function bm_texts_defaults(): array
+{
+    $file = BM_APP_DIR . '/lib/texts-defaults.json.php';
+    $data = is_file($file) ? bm_json_read($file, []) : [];
+    return is_array($data) ? $data : [];
+}
+
+/**
+ * Texts edited on the server win; keys they do not have yet come from the defaults
+ * that ship with a code update (app/lib/texts-defaults.json.php, written by
+ * tools/package.sh), so copy added by a new template never shows up blank.
+ * Lists (FAQ items, bullet lists…) are taken whole, never merged item by item.
+ */
+function bm_merge_texts($defaults, $texts)
+{
+    if (!is_array($defaults) || !is_array($texts) || bm_is_list($defaults) || bm_is_list($texts)) {
+        return $texts;
+    }
+    foreach ($defaults as $k => $v) {
+        $texts[$k] = array_key_exists($k, $texts) ? bm_merge_texts($v, $texts[$k]) : $v;
+    }
+    return $texts;
 }
 
 function bm_content_reset(): void
@@ -411,6 +449,33 @@ function excerpt(string $text, int $chars = 160): string
     $cut = bm_substr($text, 0, $chars);
     $space = strrpos($cut, ' ');
     return rtrim($space !== false ? substr($cut, 0, $space) : $cut, '،,.؛ ') . '…';
+}
+
+/**
+ * Shorten text in whole sentences (cards, meta descriptions), so copy from the content
+ * document is never cut mid-phrase and never loses a qualifier such as «وفق دراسة الاحتياج»:
+ * the whole text when it fits in $max characters, else the leading sentences (ending in
+ * «.», «؟» or «!») that fit. The first sentence is always kept whole; only a run-on text
+ * whose first sentence is longer than twice $max falls back to excerpt().
+ */
+function sentence_excerpt(string $text, int $max = 200): string
+{
+    $text = trim(preg_replace('/\s+/u', ' ', $text) ?? '');
+    if (bm_strlen($text) <= $max) {
+        return $text;
+    }
+    $parts = preg_split('/(?<=[.؟!])\s+/u', $text) ?: [$text];
+    $out = (string) array_shift($parts);
+    if (bm_strlen($out) > 2 * $max) {
+        return excerpt($text, $max);
+    }
+    foreach ($parts as $part) {
+        if (bm_strlen($out . ' ' . $part) > $max) {
+            break;
+        }
+        $out .= ' ' . $part;
+    }
+    return $out;
 }
 
 /**

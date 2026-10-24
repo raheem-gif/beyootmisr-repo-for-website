@@ -6,6 +6,31 @@
 declare(strict_types=1);
 defined('BM_APP') || exit;
 
+/**
+ * Fill a record from its defaults AND give every known field the type of its
+ * default. Content files can be edited by hand (DEVELOPMENT.md), so a stray null,
+ * number or object in a text field must not stop the whole build: text fields
+ * become strings ('' for null/arrays), flags booleans, counts integers, lists
+ * arrays; nested defaults are applied recursively. Unknown keys are kept as they are.
+ */
+function bm_typed(array $defaults, $data): array
+{
+    $out = array_replace($defaults, is_array($data) ? $data : []);
+    foreach ($defaults as $k => $d) {
+        $v = $out[$k];
+        if (is_string($d)) {
+            $out[$k] = is_scalar($v) ? (string) $v : '';
+        } elseif (is_bool($d)) {
+            $out[$k] = is_bool($v) ? $v : (is_scalar($v) && filter_var($v, FILTER_VALIDATE_BOOLEAN));
+        } elseif (is_int($d)) {
+            $out[$k] = is_numeric($v) ? (int) $v : $d;
+        } elseif (is_array($d)) {
+            $out[$k] = $d ? bm_typed($d, $v) : (is_array($v) ? $v : []);
+        }
+    }
+    return $out;
+}
+
 function bm_settings_defaults(): array
 {
     return [
@@ -42,7 +67,40 @@ function bm_settings_defaults(): array
 
 function bm_settings(): array
 {
-    return array_replace_recursive(bm_settings_defaults(), (array) bm_content('settings'));
+    return bm_typed(bm_settings_defaults(), bm_content('settings'));
+}
+
+/**
+ * Donation methods the site may show (§09/§12): each has a title and either
+ * details or an official https:// link; any other link is dropped. Every page
+ * that offers donating should use this (or bm_can_donate()), so they all agree.
+ */
+function bm_donation_methods(): array
+{
+    $out = [];
+    foreach ((array) bm_settings()['donations']['methods'] as $m) {
+        if (!is_array($m)) {
+            continue;
+        }
+        $m = bm_typed(['title' => '', 'details' => '', 'link' => '', 'note' => ''], $m);
+        foreach (['title', 'details', 'link', 'note'] as $k) {
+            $m[$k] = trim($m[$k]);
+        }
+        if ($m['link'] !== '' && !preg_match('#^https://[^\s<>"]+$#i', $m['link'])) {
+            $m['link'] = '';
+        }
+        if ($m['title'] === '' || ($m['details'] === '' && $m['link'] === '')) {
+            continue;
+        }
+        $out[] = $m;
+    }
+    return $out;
+}
+
+/** Donations are open only when enabled in the settings AND at least one method can be shown. */
+function bm_can_donate(): bool
+{
+    return !empty(bm_settings()['donations']['enabled']) && bm_donation_methods() !== [];
 }
 
 /* ------------------------------------------------------------------------ */
@@ -64,7 +122,10 @@ function bm_images($list): array
         if (!is_array($img) || empty($img['src'])) {
             continue;
         }
-        $img = array_replace(bm_image_defaults(), $img);
+        $img = bm_typed(bm_image_defaults(), $img);
+        if ($img['src'] === '') {
+            continue;
+        }
         if ($img['thumb'] === '') {
             $img['thumb'] = $img['src'];
         }
@@ -126,7 +187,7 @@ function bm_stats(): array
         if (!is_array($item) || empty($item['id'])) {
             continue;
         }
-        $items[$item['id']] = array_replace([
+        $item = bm_typed([
             'id' => '',
             'label' => '',
             'value' => null,
@@ -136,10 +197,18 @@ function bm_stats(): array
             'home' => false,
             'achievements' => true,
         ], $item);
+        if ($item['icon'] === '') {
+            $item['icon'] = 'badge-check';
+        }
+        if (!is_scalar($item['value'])) {
+            $item['value'] = null;
+        }
+        $items[$item['id']] = $item;
     }
+    $top = bm_typed(['updated_at' => '', 'period' => ''], $raw);
     return [
-        'updated_at' => (string) ($raw['updated_at'] ?? ''),
-        'period' => (string) ($raw['period'] ?? ''),
+        'updated_at' => $top['updated_at'],
+        'period' => $top['period'],
         'items' => $items,
     ];
 }
@@ -199,8 +268,8 @@ function bm_project_defaults(): array
 
 function bm_normalize_project(array $p): array
 {
-    $p = array_replace(bm_project_defaults(), $p);
-    $p['id'] = slugify((string) $p['id']);
+    $p = bm_typed(bm_project_defaults(), $p);
+    $p['id'] = slugify($p['id']);
     if (!in_array($p['status'], bm_project_statuses(), true)) {
         $p['status'] = 'ongoing';
     }
@@ -210,7 +279,7 @@ function bm_normalize_project(array $p): array
         if (!is_array($u)) {
             continue;
         }
-        $u = array_replace(['date' => '', 'title' => '', 'text' => '', 'images' => []], $u);
+        $u = bm_typed(['date' => '', 'title' => '', 'text' => '', 'images' => []], $u);
         $u['images'] = bm_images($u['images']);
         $updates[] = $u;
     }
@@ -296,8 +365,8 @@ function bm_story_defaults(): array
 
 function bm_normalize_story(array $s): array
 {
-    $s = array_replace(bm_story_defaults(), $s);
-    $s['id'] = slugify((string) $s['id']);
+    $s = bm_typed(bm_story_defaults(), $s);
+    $s['id'] = slugify($s['id']);
     if (!isset(bm_story_types()[$s['type']])) {
         $s['type'] = 'treatment';
     }
@@ -336,7 +405,7 @@ function bm_reports(bool $publishedOnly = true): array
         if (!is_array($r) || empty($r['id']) || empty($r['file'])) {
             continue;
         }
-        $r = array_replace(['id' => '', 'title' => '', 'year' => '', 'description' => '', 'file' => '', 'size' => 0, 'published' => false], $r);
+        $r = bm_typed(['id' => '', 'title' => '', 'year' => '', 'description' => '', 'file' => '', 'size' => 0, 'published' => false], $r);
         if ($publishedOnly && !$r['published']) {
             continue;
         }

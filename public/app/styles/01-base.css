@@ -7,6 +7,11 @@ html {
   text-size-adjust: 100%;
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--header-h) + 16px);
+  /* Keep focused/scrolled-to elements above the floating WhatsApp button. */
+  scroll-padding-block-end: var(--fab-space);
+}
+@media (min-width: 1024px) {
+  :root { --fab-space: calc(54px + 40px); }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -47,7 +52,10 @@ ul[role="list"], ol[role="list"] { list-style: none; }
 a { color: var(--blue-700); text-decoration-thickness: 1px; text-underline-offset: 0.3em; }
 a:hover { color: var(--blue-800); }
 
-:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; border-radius: 4px; }
+:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; border-radius: 4px; }
+/* Dark surfaces: the amber ring is the one that stands out there. */
+.site-footer, .cta-band, .initiative-card, .lightbox,
+.act-contribute, .proj-contribute, .gi-help__panel { --focus-ring: var(--amber); }
 
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }

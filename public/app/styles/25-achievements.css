@@ -188,7 +188,7 @@
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
-.tpl-achievements .filters__btn[aria-pressed="true"] .filters__count { background: rgba(255, 255, 255, 0.2); color: var(--white); }
+.tpl-achievements .filters__btn[aria-pressed="true"] .filters__count { background: var(--white); color: var(--blue-800); } /* 7.4:1 */
 
 .tpl-achievements .ach-projects__list { display: grid; gap: 1.25rem; }
 @media (min-width: 640px) { .tpl-achievements .ach-projects__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -626,6 +626,7 @@
 .tpl-project .proj-contribute {
   position: relative;
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* phones: one track that can shrink below the buttons' width */
   gap: 1.25rem 1.75rem;
   align-items: center;
   padding: clamp(1.5rem, 1rem + 2.5vw, 3rem);
@@ -664,6 +665,9 @@
 .tpl-project .proj-contribute__note .icon { flex: none; margin-block-start: 0.2em; color: var(--amber-300); }
 .tpl-project .proj-contribute__actions { flex-direction: column; align-items: stretch; }
 .tpl-project .proj-contribute__actions .btn { inline-size: 100%; }
+@media (max-width: 719px) {
+  .tpl-project .proj-contribute__actions .btn { white-space: normal; }
+}
 .tpl-project .proj-call .num { display: none; font-weight: 800; letter-spacing: 0.03em; color: var(--amber-300); }
 @media (min-width: 560px) { .tpl-project .proj-call .num { display: inline; } }
 @media (min-width: 720px) {

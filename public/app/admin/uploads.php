@@ -312,7 +312,7 @@ function adm_gd_free($im): void
 function adm_raise_memory(int $needed): void
 {
     $limit = adm_ini_bytes((string) ini_get('memory_limit'));
-    if ($limit > 0 && $limit < $needed) {
+    if ($limit > 0 && $limit < $needed && function_exists('ini_set')) {
         @ini_set('memory_limit', (string) min(max($needed, 256 * 1048576), 512 * 1048576));
     }
 }
@@ -441,7 +441,9 @@ function adm_gd_save($im, string $file, string $ext, int $quality): void
         @unlink($tmp);
         throw new AdmUserError(adm_msg_unwritable(dirname($file)));
     }
-    @chmod($file, 0644);
+    if (function_exists('chmod')) {
+        @chmod($file, 0644);
+    }
 }
 
 /* ------------------------------------------------------------------------ */
@@ -466,7 +468,9 @@ function adm_pdf_upload(array $file, array $o = []): array
     if (!@move_uploaded_file($tmp, $dest)) {
         throw new AdmUserError(adm_msg_unwritable($dir));
     }
-    @chmod($dest, 0644);
+    if (function_exists('chmod')) {
+        @chmod($dest, 0644);
+    }
     return ['file' => 'uploads/reports/' . $name, 'size' => (int) filesize($dest)];
 }
 

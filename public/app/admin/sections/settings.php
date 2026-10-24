@@ -59,16 +59,19 @@ if (strtoupper((string) $_SERVER['REQUEST_METHOD']) === 'POST') {
         $m = [
             'title' => $in->text($p . '.title', 'اسم الوسيلة (' . $n . ')', ['max' => 120]),
             'details' => $in->text($p . '.details', 'بيانات الوسيلة (' . $n . ')', ['max' => 600, 'multiline' => true]),
-            'link' => $in->url($p . '.link', 'رابط التبرع (' . $n . ')'),
+            // The site shows official https:// links only (bm_donation_methods()), so nothing else is accepted.
+            'link' => $in->url($p . '.link', 'رابط التبرع (' . $n . ')', ['https_only' => true,
+                'https_error' => 'يُقبل رابط التبرع الآمن فقط، أي الذي يبدأ بـ https:// — الروابط التي تبدأ بـ http:// لا تظهر على الموقع. انسخ الرابط الرسمي الآمن من صفحة الجهة المصدرة.']),
             'note' => $in->text($p . '.note', 'ملاحظة (' . $n . ')', ['max' => 300]),
         ];
-        if (implode('', $m) === '') {
+        $linkTyped = trim($in->raw($p . '.link')) !== '';
+        if (implode('', $m) === '' && !$linkTyped) {
             continue; // empty row = removed
         }
         if ($m['title'] === '') {
             $in->error($p . '.title', 'اكتب اسم وسيلة التبرع رقم ' . $n . ' (مثل: حساب بنكي، محفظة إلكترونية).');
         }
-        if ($m['details'] === '' && $m['link'] === '') {
+        if ($m['details'] === '' && $m['link'] === '' && !$linkTyped) {
             $in->error($p . '.details', 'أدخل بيانات الوسيلة رقم ' . $n . ' أو رابطها.');
         }
         $methods[] = $m;
@@ -216,8 +219,8 @@ $logoRecord = $s['logo'] !== '' ? ['src' => $s['logo'], 'thumb' => $s['logo'], '
 
 <?= adm_card('الصفحات الرسمية', '<div class="adm-cols">'
     . $f('social.facebook', 'صفحة فيسبوك', ['type' => 'url', 'max' => 500, 'placeholder' => 'https://www.facebook.com/…'])
-    . $f('social.instagram', 'حساب إنستجرام', ['type' => 'url', 'max' => 500, 'placeholder' => 'https://www.instagram.com/…'])
-    . '</div><p class="adm-hint">أضف الحسابات الرسمية الموثقة فقط.</p>',
+    . $f('social.instagram', 'صفحة إنستجرام', ['type' => 'url', 'max' => 500, 'placeholder' => 'https://www.instagram.com/…'])
+    . '</div><p class="adm-hint">أضف الصفحات الرسمية الموثقة فقط.</p>',
     ['icon' => 'share-2', 'id' => 'set-social']) ?>
 
 <?= adm_card('الهوية القانونية', adm_alert('لا تُكتب صفة النفع العام وتصاريح جمع التبرعات إلا بعد إثباتها، وبالنص المطابق للمستندات المعتمدة بأرقامها ونطاقها وتواريخ صلاحيتها.', 'warning')
@@ -247,7 +250,8 @@ $methodsHtml = adm_repeater([
         };
         return '<div class="adm-cols">'
             . adm_field(['path' => $path . '.title', 'label' => 'اسم الوسيلة', 'value' => $val('title'), 'max' => 120, 'placeholder' => 'مثل: حساب بنكي باسم المؤسسة'])
-            . adm_field(['path' => $path . '.link', 'label' => 'رابط التبرع الرسمي (اختياري)', 'type' => 'url', 'value' => $val('link'), 'max' => 500])
+            . adm_field(['path' => $path . '.link', 'label' => 'رابط التبرع الرسمي (اختياري)', 'type' => 'url', 'value' => $val('link'), 'max' => 500,
+                'placeholder' => 'https://…', 'dir' => 'ltr', 'hint' => 'رابط آمن يبدأ بـ https:// فقط.'])
             . '</div>'
             . adm_field(['path' => $path . '.details', 'label' => 'البيانات (رقم الحساب، اسم البنك، رقم المحفظة…)', 'type' => 'textarea', 'rows' => 3, 'value' => $val('details'), 'max' => 600])
             . adm_field(['path' => $path . '.note', 'label' => 'ملاحظة (اختياري)', 'value' => $val('note'), 'max' => 300]);

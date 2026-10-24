@@ -24,7 +24,9 @@ mobile-first, fast, and ready to upload to **Turbify** hosting.
 
 Turbify Web Hosting uses **cPanel**. The public web folder is **`public_html`**.
 
-1. Get the package **`dist/beyoot-misr-site-full.zip`** (or create it: `tools/package.sh`).
+1. Get the package **`dist/beyoot-misr-site-full.zip`** — create it with `tools/package.sh`
+   (needs PHP, Python 3 and `zip`), or download this repository as a ZIP from GitHub and
+   use the contents of its `public/` folder (zip them, or upload them as they are).
 2. In Turbify: **My Services → Hosting → File Manager** (in the *Files* section). Open `public_html`.
 3. **Upload** the zip, then right-click it → **Extract** into `public_html`. Delete the zip afterwards.
    *No Extract option?* Unzip on your computer and upload the contents of the `public/`

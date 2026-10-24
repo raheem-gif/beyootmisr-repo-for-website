@@ -3,7 +3,8 @@
  * «النصوص» — editor for content/texts.json.
  *
  * One form per top-level group (saved independently, merged into the fresh file
- * under a lock). The save is structure-preserving: it walks the CURRENT structure,
+ * under a lock). The save is structure-preserving: it walks the CURRENT structure
+ * (texts.json + keys only in the shipped texts-defaults, merged like bm_content()),
  * takes posted values only for existing editable leaves, keeps "_" metadata keys,
  * and rejects unknown keys. A hash of the group detects edits made by someone else
  * in the meantime (the form is shown again with the editor's values).
@@ -19,7 +20,16 @@ $repeatAdd = ['contact.faq' => 'إضافة سؤال'];
 AdmPage::$title = 'النصوص';
 AdmPage::$lead = 'نصوص صفحات الموقع كما وردت في وثيقة المحتوى. افتح القسم الذي تريده، عدّل النص، ثم اضغط «حفظ». يُحفظ كل قسم وحده ويُحدَّث الموقع تلقائيًا.';
 
-$texts = adm_content_load('texts');
+/*
+ * Keys that exist only in app/lib/texts-defaults.json.php (shipped by a code update for copy
+ * added by new templates) are merged in exactly as bm_content('texts') does for the public
+ * site, so they are editable right after the update: the form shows them, the structure check
+ * accepts them, and saving a group writes them into texts.json.
+ */
+$withDefaults = function ($data) {
+    return is_array($data) ? bm_merge_texts(bm_texts_defaults(), $data) : $data;
+};
+$texts = $withDefaults(adm_content_load('texts'));
 if (!is_array($texts)) {
     $texts = [];
 }
@@ -57,6 +67,8 @@ $varNames = [
     'total' => 'عدد الصور',
     'num' => 'رقم النشاط',
     'activity' => 'اسم النشاط',
+    'project' => 'اسم المشروع',
+    'location' => 'موقع المشروع',
 ];
 $placeholders = function (string $s): array {
     preg_match_all('/\{([a-z_]+)\}/', $s, $m);
@@ -249,11 +261,12 @@ if (strtoupper((string) $_SERVER['REQUEST_METHOD']) === 'POST') {
 
     $groupLabel = (string) ($texts[$group]['_label'] ?? $group);
     try {
-        $result = adm_content_save('texts', function ($data) use ($group, $posted, $hash, $merge, $hashOf, &$candidate, &$conflict, &$errors) {
-            if (!isset($data[$group]) || !is_array($data[$group])) {
+        $result = adm_content_save('texts', function ($data) use ($group, $posted, $hash, $merge, $hashOf, $withDefaults, &$candidate, &$conflict, &$errors) {
+            $full = $withDefaults($data);
+            if (!is_array($full) || !isset($full[$group]) || !is_array($full[$group])) {
                 throw new AdmUserError('هذا القسم لم يعد موجودًا. أعد تحميل الصفحة.');
             }
-            $cur = $data[$group];
+            $cur = $full[$group]; // the file's group + keys only in the shipped defaults
             $candidate = $merge($cur, $posted, [$group]);
             if ($errors) {
                 return $data;
@@ -262,10 +275,14 @@ if (strtoupper((string) $_SERVER['REQUEST_METHOD']) === 'POST') {
                 $conflict = true;
                 return $data;
             }
+            if ($candidate === $cur) {
+                return $data; // nothing edited: do not write default keys on their own
+            }
             $data[$group] = $candidate;
             return $data;
-        }, 'texts.save', function ($old, $new) use ($group, $groupLabel, $diff) {
-            $paths = $diff($old[$group] ?? [], $new[$group] ?? [], $group);
+        }, 'texts.save', function ($old, $new) use ($group, $groupLabel, $diff, $withDefaults) {
+            $before = $withDefaults($old);
+            $paths = $diff($before[$group] ?? [], $new[$group] ?? [], $group);
             $shown = array_slice($paths, 0, 6);
             return '«' . $groupLabel . '»: ' . adm_plural(count($paths), 'حقل واحد', 'حقلان', 'حقول', 'حقلًا')
                 . ' (' . implode('، ', $shown) . (count($paths) > 6 ? '، …' : '') . ')';
@@ -283,7 +300,7 @@ if (strtoupper((string) $_SERVER['REQUEST_METHOD']) === 'POST') {
         $errors = $errors ?: ['t.' . $group => $e->getMessage()];
     }
     // Show the form again with the editor's values.
-    $texts = adm_content_load('texts');
+    $texts = $withDefaults(adm_content_load('texts'));
     if ($candidate !== null) {
         $override[$group] = $candidate;
     }

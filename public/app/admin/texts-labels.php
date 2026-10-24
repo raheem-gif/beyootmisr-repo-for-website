@@ -98,7 +98,7 @@ function adm_text_labels(): array
         'address_label' => 'عنوان المركز الرئيسي',
         'email_label' => 'عنوان البريد الإلكتروني',
         'social_label' => 'عنوان الصفحات الرسمية',
-        'hours_label' => 'عنوان ساعات العمل',
+        'hours_label' => 'عنوان ساعات استقبال الرسائل',
         'facebook' => 'اسم «فيسبوك»',
         'instagram' => 'اسم «إنستجرام»',
         'message' => 'عنوان حقل الرسالة',
@@ -237,6 +237,18 @@ function adm_text_labels(): array
         'contact.map_link' => 'نص رابط الخريطة',
         'contact.compose.legal_note' => 'ملاحظة توجيه الاستشارات القانونية',
         'contact.compose.privacy_link' => 'نص رابط سياسة الخصوصية',
+        'activities.inquiry_title' => 'عنوان «استفسر عن هذا النشاط» (قبل اعتماد وسائل التبرع)',
+        'activities.assistance_note' => 'ملاحظة تحت قائمة المساعدات (في كل صفحات الأنشطة)',
+        'project.inquiry_title' => 'عنوان «استفسر عن هذا المشروع» (قبل اعتماد وسائل التبرع)',
+        'project.stages_empty_done' => 'النص عند عدم وجود مراحل لمشروع منجز',
+        'project.meta_place' => 'صيغة «المشروع في موقعه» لوصف صفحة المشروع في نتائج البحث',
+        'project.meta_auto' => 'وصف صفحة المشروع في نتائج البحث حين يكون الملخص قصيرًا',
+        'project.meta_auto_plain' => 'الوصف نفسه لمشروع غير مرتبط بنشاط',
+        'ehna_maaki.call_button' => 'زر الاتصال بالخط الساخن (بصيغة المؤنث)',
+        'ehna_maaki.whatsapp_button' => 'زر واتساب المؤسسة (بصيغة المؤنث)',
+        'get_involved.projects.text' => 'النص قبل اعتماد وسائل التبرع',
+        'get_involved.projects.text_enabled' => 'النص بعد اعتماد وسائل التبرع',
+        'not_found.links_title' => 'عنوان قائمة «صفحات مقترحة»',
     ];
 }
 

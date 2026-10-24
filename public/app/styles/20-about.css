@@ -62,15 +62,6 @@
 @media (min-width: 960px) {
   .tpl-about .about-story__grid { grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr); }
 }
-.tpl-about .about-story .section-title::after {
-  content: "";
-  display: block;
-  inline-size: 56px;
-  block-size: 5px;
-  margin-block-start: 0.9rem;
-  border-radius: 5px;
-  background: var(--amber);
-}
 .tpl-about .about-story__body { margin-block-start: 1.4rem; font-size: var(--fs-md); color: var(--ink-2); line-height: 1.95; }
 .tpl-about .about-story__body p:first-child {
   font-size: var(--fs-lg);

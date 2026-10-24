@@ -22,7 +22,9 @@ if (strtoupper((string) $_SERVER['REQUEST_METHOD']) === 'POST') {
             adm_flash('error', 'إنشاء ملف ZIP غير متاح على هذه الاستضافة. اتبع طريقة التنزيل اليدوية الموضحة أدناه.');
             adm_redirect('backup');
         }
-        @set_time_limit(300);
+        if (function_exists('set_time_limit')) { // hosts may disable it (a fatal error on PHP 8)
+            @set_time_limit(300);
+        }
         $tmpDir = is_writable(sys_get_temp_dir()) ? sys_get_temp_dir() : adm_storage_dir('tmp');
         $tmp = @tempnam($tmpDir, 'bmz');
         $zip = new ZipArchive();
@@ -57,14 +59,16 @@ if (strtoupper((string) $_SERVER['REQUEST_METHOD']) === 'POST') {
             . "uploads/      uploaded photos and PDF reports. Upload them to the same folders.\n\n"
             . "Admin accounts are NOT included (they stay on the server in app/storage).\n");
         $zip->close();
-        adm_audit('backup.download', $count . ' ملف');
+        adm_audit('backup.download', adm_plural($count, 'ملف واحد', 'ملفان', 'ملفات', 'ملفًا'));
         while (ob_get_level() > 0) {
             ob_end_clean();
         }
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment; filename="beyootmisr-backup-' . date('Ymd-Hi') . '.zip"');
         header('Content-Length: ' . (string) filesize($tmp));
-        ignore_user_abort(true); // make sure the temporary file is removed
+        if (function_exists('ignore_user_abort')) {
+            @ignore_user_abort(true); // make sure the temporary file is removed
+        }
         readfile($tmp);
         @unlink($tmp);
         exit;

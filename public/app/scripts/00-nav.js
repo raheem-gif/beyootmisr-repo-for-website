@@ -37,11 +37,9 @@
       setOpen(toggle.getAttribute("aria-expanded") !== "true");
     });
     document.addEventListener("keydown", function (e) {
-      if (e.key !== "Escape") return;
-      if (body.classList.contains("nav-open")) {
-        setOpen(false);
-        toggle.focus();
-      }
+      if (e.key !== "Escape" || !body.classList.contains("nav-open")) return;
+      setOpen(false);
+      toggle.focus();
       closeSubs();
     });
     // Following an in-page link (e.g. #donate) closes the drawer.
@@ -64,25 +62,55 @@
 
   var subToggles = Array.prototype.slice.call(document.querySelectorAll("[data-sub-toggle]"));
 
-  function closeSubs(except) {
+  /* Open/close one sub-menu. Closing a desktop panel while the pointer is over it
+     also marks the item .is-dismissed, so CSS :hover does not keep it on screen
+     (Esc and the toggle always dismiss; the class clears when the pointer leaves). */
+  function setSub(btn, open, dismiss) {
+    var panel = document.getElementById(btn.getAttribute("aria-controls"));
+    var item = btn.closest(".has-sub");
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    if (panel) panel.classList.toggle("is-open", open);
+    if (!item) return;
+    if (open) item.classList.remove("is-dismissed");
+    else if (dismiss && desktop.matches && item.matches(":hover")) item.classList.add("is-dismissed");
+  }
+
+  function closeSubs(except, dismiss) {
     subToggles.forEach(function (btn) {
-      if (btn === except) return;
-      btn.setAttribute("aria-expanded", "false");
-      var panel = document.getElementById(btn.getAttribute("aria-controls"));
-      if (panel) panel.classList.remove("is-open");
+      if (btn !== except) setSub(btn, false, dismiss);
     });
   }
 
   subToggles.forEach(function (btn) {
     var panel = document.getElementById(btn.getAttribute("aria-controls"));
-    if (!panel) return;
+    var item = btn.closest(".has-sub");
+    if (!panel || !item) return;
     btn.addEventListener("click", function (e) {
       e.stopPropagation();
       var open = btn.getAttribute("aria-expanded") !== "true";
       if (desktop.matches) closeSubs(btn);
-      btn.setAttribute("aria-expanded", open ? "true" : "false");
-      panel.classList.toggle("is-open", open);
+      setSub(btn, open, true);
     });
+    item.addEventListener("mouseleave", function () {
+      item.classList.remove("is-dismissed");
+    });
+    // Desktop: a panel opened from the keyboard closes once focus leaves its item,
+    // so it never covers the content the visitor tabs to next.
+    item.addEventListener("focusout", function (e) {
+      if (!desktop.matches || (e.relatedTarget && item.contains(e.relatedTarget))) return;
+      setSub(btn, false, false);
+    });
+  });
+
+  // Desktop: Esc closes any open or hovered panel and returns focus to its toggle.
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape" || !desktop.matches) return;
+    var active = document.activeElement;
+    var item = active && active.closest ? active.closest(".has-sub") : null;
+    closeSubs(null, true);
+    var btn = item ? item.querySelector("[data-sub-toggle]") : null;
+    var panel = btn ? document.getElementById(btn.getAttribute("aria-controls")) : null;
+    if (panel && panel.contains(active)) btn.focus();
   });
 
   document.addEventListener("click", function (e) {

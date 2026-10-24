@@ -15,14 +15,16 @@ if (!$a) {
     throw new RuntimeException('Unknown activity: ' . $slug);
 }
 
-BM::$page['title'] = $a['name'] . ' | ' . $a['subtitle'];
-BM::$page['description'] = excerpt((string) $a['description']);
+/* «أفراح — تجهيز العرائس»; the layout adds « | مؤسسة بيوت مصر». */
+BM::$page['title'] = trim($a['subtitle']) !== '' ? $a['name'] . ' — ' . $a['subtitle'] : $a['name'];
+
+/* Meta description in whole sentences (no cut mid-clause that drops «وفق …»). */
+BM::$page['description'] = sentence_excerpt((string) $a['description'], 200);
 
 $settings = bm_settings();
 $contact = $settings['contact'];
-$donations = $settings['donations'];
-$canDonate = !empty($donations['enabled']) && !empty($donations['methods']);
-$allocationNote = trim((string) ($donations['allocation_note'] ?? ''));
+$canDonate = bm_can_donate();
+$allocationNote = trim((string) $settings['donations']['allocation_note']);
 $waLink = wa_general((string) t('activities.wa_message', ['activity' => $a['name']]));
 $hotline = trim((string) $contact['hotline']);
 $telLink = $hotline !== '' ? tel_href($hotline) : '';
@@ -59,6 +61,8 @@ $assistTitle = trim((string) $a['assistance_title']) !== '' ? (string) $a['assis
 $assistance = array_values(array_filter(array_map('strval', (array) $a['assistance']), function ($x) {
     return trim($x) !== '';
 }));
+/* The document's qualifier for every list: help depends on the needs study and the means available. */
+$assistNote = trim((string) t('activities.assistance_note'));
 
 /*
  * The three documentation sections. Each is "compact" while it only has an
@@ -151,13 +155,16 @@ $heroActions = $canDonate
 <div class="section act-intro">
   <div class="container act-intro__grid">
     <section class="act-about" id="about" aria-labelledby="about-title">
-      <h2 class="section-title" id="about-title"><?= te('activities.section_about') ?></h2>
+      <h2 class="section-title section-title--bar" id="about-title"><?= te('activities.section_about') ?></h2>
       <div class="act-about__text"><?= p_html($a['description']) ?></div>
     </section>
     <?php if ($assistance): ?>
     <section class="act-assist" id="assistance" aria-labelledby="assistance-title">
       <h2 class="act-assist__title" id="assistance-title"><span class="act-assist__icon"><?= icon('list-checks') ?></span><?= e($assistTitle) ?></h2>
       <?= check_list($assistance, 'act-assist__list') ?>
+      <?php if ($assistNote !== ''): ?>
+      <p class="act-assist__note"><?= icon('badge-info') ?><span><?= e($assistNote) ?></span></p>
+      <?php endif; ?>
     </section>
     <?php endif; ?>
   </div>
@@ -187,7 +194,7 @@ $heroActions = $canDonate
       <span class="act-contribute__icon"><?= icon($canDonate ? 'hand-heart' : 'heart-handshake') ?></span>
       <div class="act-contribute__body">
         <?= eyebrow($a['name'], 'eyebrow--light') ?>
-        <h2 class="act-contribute__title" id="contribute-title"><?= te('buttons.contribute_activity') ?></h2>
+        <h2 class="act-contribute__title" id="contribute-title"><?= te($canDonate ? 'buttons.contribute_activity' : 'activities.inquiry_title') ?></h2>
         <?= p_html((string) t($canDonate ? 'activities.contribute_text' : 'activities.contribute_pending'), 'act-contribute__text') ?>
         <?php if ($canDonate && $allocationNote !== ''): ?>
         <p class="act-contribute__note"><?= icon('badge-info') ?><span><?= e($allocationNote) ?></span></p>

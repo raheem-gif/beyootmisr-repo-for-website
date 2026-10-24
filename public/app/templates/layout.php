@@ -14,12 +14,20 @@ $description = $page['description'] !== '' ? $page['description'] : (string) t('
 $canonical = absolute_url($page['path']);
 $ogImage = absolute_url($page['image'] !== '' ? $page['image'] : 'assets/img/og-image.png');
 $settings = bm_settings();
+// Floating WhatsApp button: the «إحنا معاكي» page sends legal questions to the
+// initiative's own WhatsApp line (§06/§10); every other page uses the general line.
+// No number that can be dialled → no button (never an empty href).
+$waLegalLink = $page['tpl'] === 'ehna-maaki' ? wa_legal() : '';
+$waLegalPage = $waLegalLink !== '';
+$wa = $waLegalPage ? $waLegalLink : wa_general();
+$waLabel = $waLegalPage ? te('buttons.legal_whatsapp') : te('buttons.whatsapp');
 ?>
 <!doctype html>
-<html lang="ar" dir="rtl" data-l-close="<?= te('ui.close') ?>" data-l-prev="<?= te('ui.previous') ?>" data-l-next="<?= te('ui.next') ?>">
+<html lang="ar" dir="rtl" data-l-close="<?= te('ui.close') ?>" data-l-prev="<?= te('ui.previous') ?>" data-l-next="<?= te('ui.next') ?>" data-l-gallery="<?= te('ui.gallery_title') ?>" data-l-image-of="<?= te('ui.image_of') ?>">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://wa.me https://api.whatsapp.com">
 <title><?= e($docTitle) ?></title>
 <meta name="description" content="<?= e($description) ?>">
 <?php if ($page['noindex']): ?>
@@ -46,7 +54,9 @@ $settings = bm_settings();
 <link rel="apple-touch-icon" href="<?= e(u('assets/img/apple-touch-icon.png')) ?>">
 <link rel="manifest" href="<?= e(u('site.webmanifest')) ?>">
 <link rel="preload" href="<?= e(u('assets/fonts/cairo-arabic.woff2')) ?>" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="<?= e(asset('css/site.css')) ?>">
+<?php foreach (bm_page_styles((string) $page['tpl']) as $css): ?>
+<link rel="stylesheet" href="<?= e(asset($css)) ?>">
+<?php endforeach; ?>
 <?php if ($isHome): ?>
 <script type="application/ld+json"><?= json_encode(array_filter([
     '@context' => 'https://schema.org',
@@ -71,10 +81,12 @@ $settings = bm_settings();
 <?= $content ?>
 </main>
 <?php include BM_APP_DIR . '/templates/partials/footer.php'; ?>
-<?php $wa = wa_general(); if ($wa !== ''): ?>
-<a class="wa-fab" href="<?= e($wa) ?>" target="_blank" rel="noopener" aria-label="<?= te('buttons.whatsapp') ?> (<?= te('ui.opens_whatsapp') ?>)">
-  <span class="wa-fab__icon"><?= icon('whatsapp') ?></span><span class="wa-fab__label"><?= te('buttons.whatsapp') ?></span>
-</a>
+<?php if ($wa !== ''): ?>
+<aside class="wa-fab-region" aria-label="<?= $waLabel ?>">
+  <a class="wa-fab" href="<?= e($wa) ?>" target="_blank" rel="noopener" aria-label="<?= $waLabel ?> (<?= te('ui.opens_whatsapp') ?>)">
+    <span class="wa-fab__icon"><?= icon('whatsapp') ?></span><span class="wa-fab__label"><?= $waLabel ?></span>
+  </a>
+</aside>
 <?php endif; ?>
 <script src="<?= e(asset('js/site.js')) ?>" defer></script>
 </body>

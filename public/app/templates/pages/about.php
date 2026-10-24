@@ -110,7 +110,7 @@ echo page_hero([
 <section class="section about-story" id="story" aria-labelledby="story-title">
   <div class="container about-story__grid">
     <div class="about-story__text">
-      <h2 class="section-title" id="story-title"><?= te('about.story.title') ?></h2>
+      <h2 class="section-title section-title--bar" id="story-title"><?= te('about.story.title') ?></h2>
       <div class="about-story__body"><?= p_html(tl('about.story.paragraphs')) ?></div>
       <div class="actions about-story__actions">
         <?= btn(t('buttons.discover_activities'), 'activities.html', 'primary', ['icon_end' => 'arrow-left']) ?>

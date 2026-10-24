@@ -5,7 +5,9 @@
  * server shows it for any missing URL, at any folder depth (.htaccess:
  * ErrorDocument 404 /404.html).
  * Layout: the brand skyline inside a large arched window, «404» with a lit
- * arched window as its zero, the message, the main ways back, quick links.
+ * arched window as its zero, the message, the main ways back, suggested pages
+ * (a navigation named «صفحات مقترحة», distinct from the footer's «روابط مختصرة» so
+ * every landmark has a unique name).
  */
 defined('BM_APP') || exit;
 
@@ -36,7 +38,7 @@ $links = [
         <?= btn(t('nav.contact'), 'contact.html', 'ghost', ['icon' => 'message-circle']) ?>
       </div>
       <nav class="nf__links" aria-labelledby="nf-links-title">
-        <p class="nf__links-title" id="nf-links-title"><?= te('nav.quick_links') ?></p>
+        <p class="nf__links-title" id="nf-links-title"><?= te('not_found.links_title') ?></p>
         <ul role="list">
           <?php foreach ($links as [$key, $href]): ?>
           <li><a href="<?= e(u($href)) ?>"><?= te($key) ?></a></li>

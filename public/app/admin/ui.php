@@ -17,7 +17,7 @@
  *   adm_alert(string $text, string $variant = 'info', string $title = ''): string
  *   adm_empty(string $icon, string $title, string $text = ''): string
  *   adm_time(int $ts): string / adm_date(int $ts): string / adm_ago(int $ts): string   Arabic dates
- *   adm_plural(int $n, string $one, string $two, string $few, string $many): string
+ *   adm_plural(int $n, string $one, string $two, string $few, string $many): string   «5 صور»، «20 صورة»
  */
 declare(strict_types=1);
 defined('BM_APP') || exit;
@@ -263,6 +263,12 @@ function adm_time(int $ts): string
     return adm_date($ts) . '، ' . date('g:i', $ts) . ' ' . (date('A', $ts) === 'AM' ? 'ص' : 'م');
 }
 
+/**
+ * Arabic count + noun: adm_plural($n, 'حرف واحد', 'حرفان', 'أحرف', 'حرفًا') → «حرف واحد», «حرفان»,
+ * «5 أحرف», «120 حرفًا», «105 أحرف», «100 حرف». The ending of 11–99 decides from the last two
+ * digits; 0 and 100, 200, 101… take the singular without the tanween ending of $many.
+ * admin.js has the same rules (plural()).
+ */
 function adm_plural(int $n, string $one, string $two, string $few, string $many): string
 {
     if ($n === 1) {
@@ -271,10 +277,14 @@ function adm_plural(int $n, string $one, string $two, string $few, string $many)
     if ($n === 2) {
         return $two;
     }
-    if ($n >= 3 && $n <= 10) {
+    $r = $n % 100;
+    if ($r >= 3 && $r <= 10) {
         return $n . ' ' . $few;
     }
-    return $n . ' ' . $many;
+    if ($r >= 11) {
+        return $n . ' ' . $many;
+    }
+    return $n . ' ' . preg_replace('/(?:\x{064B}\x{0627}|\x{0627}\x{064B})$/u', '', $many);
 }
 
 function adm_ago(int $ts): string

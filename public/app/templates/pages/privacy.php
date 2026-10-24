@@ -13,7 +13,8 @@ BM::$page['title'] = (string) t('privacy.meta_title');
 BM::$page['description'] = (string) t('privacy.meta_description');
 
 $contact = bm_settings()['contact'];
-$hotline = trim((string) $contact['hotline']);
+/* Numbers count only when they can be dialled, so no link gets an empty href. */
+$hotline = tel_href((string) $contact['hotline']) !== '' ? trim((string) $contact['hotline']) : '';
 
 $sections = [];
 foreach (tl('privacy.sections') as $s) {
@@ -37,8 +38,9 @@ if ($hotline !== '') {
     $numberLinks[e($hotline)] = '<a class="pv-num" href="' . e(tel_href($hotline)) . '">' . phone_html($hotline) . '</a>';
 }
 $legal = trim((string) $contact['whatsapp_legal']);
-if ($legal !== '' && !isset($numberLinks[e($legal)])) {
-    $numberLinks[e($legal)] = '<a class="pv-num" href="' . e(wa_legal()) . '" target="_blank" rel="noopener">' . phone_html($legal) . '</a>';
+$waLegal = wa_legal();
+if ($legal !== '' && $waLegal !== '' && !isset($numberLinks[e($legal)])) {
+    $numberLinks[e($legal)] = '<a class="pv-num" href="' . e($waLegal) . '" target="_blank" rel="noopener">' . phone_html($legal) . '</a>';
 }
 /* Strings inside lists are not filled by t(): fill {hotline} etc. here. */
 $body = function (string $text) use ($numberLinks): string {

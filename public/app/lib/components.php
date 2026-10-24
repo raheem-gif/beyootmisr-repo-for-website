@@ -86,7 +86,8 @@ function eyebrow(string $text, string $class = ''): string
 
 /**
  * Section heading block.
- * Options: eyebrow, title, text, id (heading id), level (2), align ('center'|'start'), actions (html), class.
+ * Options: eyebrow, title, text, id (heading id), level (2), align ('center'|'start'), actions (html), class,
+ * bar (true: the short amber bar under the title, `.section-title--bar`).
  */
 function section_head(array $o): string
 {
@@ -95,7 +96,8 @@ function section_head(array $o): string
     $out = '<div class="section-head section-head--' . e($align) . (!empty($o['class']) ? ' ' . e($o['class']) : '') . '">';
     $out .= eyebrow((string) ($o['eyebrow'] ?? ''));
     if (!empty($o['title'])) {
-        $out .= '<h' . $level . (!empty($o['id']) ? ' id="' . e($o['id']) . '"' : '') . ' class="section-title">' . e($o['title']) . '</h' . $level . '>';
+        $out .= '<h' . $level . (!empty($o['id']) ? ' id="' . e($o['id']) . '"' : '') . ' class="section-title' . (!empty($o['bar']) ? ' section-title--bar' : '') . '">'
+            . e($o['title']) . '</h' . $level . '>';
     }
     if (!empty($o['text'])) {
         $out .= '<div class="section-lead">' . p_html($o['text']) . '</div>';
@@ -417,38 +419,49 @@ function gallery(array $images, array $o = []): string
 /* Contact                                                                   */
 /* ------------------------------------------------------------------------ */
 
-/** Default WhatsApp link to the general number with a greeting. */
-function wa_general(string $message = ''): string
+/** International digits of the general WhatsApp line: its own number, else the hotline ('' when neither is set). */
+function wa_general_number(): string
 {
     $c = bm_settings()['contact'];
-    return wa_href($c['whatsapp_general'] !== '' ? $c['whatsapp_general'] : $c['hotline'], $message !== '' ? $message : (string) t('ui.wa_greeting'));
+    $n = intl_phone((string) $c['whatsapp_general']);
+    return $n !== '' ? $n : intl_phone((string) $c['hotline']);
 }
 
+/** Default WhatsApp link to the general number with a greeting ('' when no number is set). */
+function wa_general(string $message = ''): string
+{
+    return wa_href(wa_general_number(), $message !== '' ? $message : (string) t('ui.wa_greeting'));
+}
+
+/** WhatsApp link to the «إحنا معاكي» line ('' when no number is set). */
 function wa_legal(): string
 {
-    return wa_href(bm_settings()['contact']['whatsapp_legal'], (string) t('ehna_maaki.wa_message'));
+    return wa_href((string) bm_settings()['contact']['whatsapp_legal'], (string) t('ehna_maaki.wa_message'));
 }
 
-/** Big call / WhatsApp buttons for the two official numbers. */
+/** Big call / WhatsApp buttons for the two official numbers (only those that can be dialled). */
 function help_lines(): string
 {
     $c = bm_settings()['contact'];
+    $tel = tel_href((string) $c['hotline']);
+    $wa = wa_general();
+    $waLegal = wa_legal();
     $out = '<div class="help-lines">';
-    if ($c['hotline'] !== '') {
+    if ($tel !== '') {
         $out .= '<div class="help-line">'
             . '<p class="help-line__label">' . te('get_involved.help.general_label') . '</p>'
             . '<p class="help-line__num">' . phone_html($c['hotline']) . '</p>'
             . '<div class="actions">'
-            . btn(t('buttons.call_hotline'), tel_href($c['hotline']), 'primary', ['icon' => 'phone', 'size' => 'sm'])
-            . btn(t('buttons.whatsapp'), wa_general(), 'whatsapp', ['icon' => 'whatsapp', 'size' => 'sm'])
+            . btn(t('buttons.call_hotline'), $tel, 'primary', ['icon' => 'phone', 'size' => 'sm'])
+            . ($wa !== '' ? btn(t('buttons.whatsapp'), $wa, 'whatsapp', ['icon' => 'whatsapp', 'size' => 'sm']) : '')
             . '</div></div>';
     }
-    if ($c['whatsapp_legal'] !== '') {
+    if ($waLegal !== '') {
         $out .= '<div class="help-line help-line--legal">'
             . '<p class="help-line__label">' . te('get_involved.help.legal_label') . '</p>'
             . '<p class="help-line__num">' . phone_html($c['whatsapp_legal']) . '</p>'
             . '<div class="actions">'
-            . btn(t('buttons.legal_whatsapp'), wa_legal(), 'whatsapp', ['icon' => 'whatsapp', 'size' => 'sm'])
+            . btn(t('buttons.legal_whatsapp'), $waLegal, 'whatsapp', ['icon' => 'whatsapp', 'size' => 'sm'])
             . '</div></div>';
     }
     return $out . '</div>';
@@ -462,8 +475,8 @@ function help_lines(): string
 function wa_form(array $o = []): string
 {
     $c = bm_settings()['contact'];
-    $general = intl_phone($c['whatsapp_general'] !== '' ? $c['whatsapp_general'] : $c['hotline']);
-    $legal = intl_phone($c['whatsapp_legal']);
+    $general = wa_general_number();
+    $legal = intl_phone((string) $c['whatsapp_legal']);
     if ($general === '') {
         return '';
     }

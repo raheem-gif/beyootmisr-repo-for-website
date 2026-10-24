@@ -93,6 +93,11 @@ Image records look like `{"src": "uploads/images/abc.jpg", "thumb": "uploads/ima
   with an `<h2 id>`.
 * Data-driven sections must have an honest empty state (no fake numbers, no
   stock photos — content document §08, §12).
+* Section titles with the amber bar: `section_head(['bar' => true, …])` (CSS `.section-title--bar`).
+* Shortening PDF copy (cards, meta descriptions): `sentence_excerpt()` cuts at a sentence
+  boundary, never mid-phrase, so the document's qualifiers are kept.
+* Phone/WhatsApp links: `wa_general()`, `wa_general_number()` (falls back to the hotline),
+  `wa_legal()`, `tel_href()`. A number that cannot be dialled renders no link at all.
 * Whether donating is possible: use `bm_can_donate()` / `bm_donation_methods()`
   (`lib/data.php`) so every page agrees (only titled methods with details or an
   official `https://` link count).

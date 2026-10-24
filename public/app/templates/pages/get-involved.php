@@ -6,9 +6,10 @@
  * The section ids are fixed: the header buttons and the «شاركنا الخير» band link
  * to #donate, #volunteer, #in-kind and #request-help.
  *
- * Donation methods appear only when settings.donations is enabled AND has
- * methods (verified accounts and permits, §09/§12); otherwise an honest
- * "announced once approved" notice with the hotline.
+ * Donation methods appear only when bm_can_donate(): settings.donations is enabled
+ * AND has a method that can be shown (verified accounts and permits, §09/§12) — the
+ * same rule as the activity and project pages; otherwise an honest "announced once
+ * approved" notice with the hotline.
  * Closures only — no named functions in templates.
  */
 defined('BM_APP') || exit;
@@ -18,28 +19,11 @@ BM::$page['description'] = (string) t('get_involved.meta_description');
 
 $settings = bm_settings();
 $contact = $settings['contact'];
-$donations = $settings['donations'];
 
-$methods = [];
-foreach ((array) $donations['methods'] as $m) {
-    if (!is_array($m)) {
-        continue;
-    }
-    $m = array_replace(['title' => '', 'details' => '', 'link' => '', 'note' => ''], $m);
-    $m = array_map(function ($v) {
-        return trim((string) $v);
-    }, $m);
-    // Official https links only.
-    if ($m['link'] !== '' && !preg_match('#^https://[^\s<>"]+$#i', $m['link'])) {
-        $m['link'] = '';
-    }
-    if ($m['title'] === '' || ($m['details'] === '' && $m['link'] === '')) {
-        continue;
-    }
-    $methods[] = $m;
-}
-$canDonate = !empty($donations['enabled']) && $methods;
-$allocationNote = trim((string) $donations['allocation_note']);
+/* Titled methods with details or an official https:// link (bm_donation_methods()), shared with every page. */
+$methods = bm_donation_methods();
+$canDonate = bm_can_donate();
+$allocationNote = trim((string) $settings['donations']['allocation_note']);
 
 $hotline = trim((string) $contact['hotline']);
 $telLink = $hotline !== '' ? tel_href($hotline) : '';
@@ -74,6 +58,16 @@ $callBtn = function (string $variant = 'primary', string $size = '') use ($hotli
     }
     return '<a class="btn btn--' . e($variant) . ($size !== '' ? ' btn--' . e($size) : '') . ' gi-call" href="' . e($telLink) . '">'
         . icon('phone') . '<span>' . te('buttons.call_hotline') . '</span>' . phone_html($hotline) . '</a>';
+};
+
+/*
+ * Bank details, one line per row. Account numbers, IBANs and wallet numbers are kept
+ * in one piece (never split across lines), so a donor copying them by hand cannot
+ * misread a wrapped digit.
+ */
+$methodDetails = function (string $details): string {
+    $html = nl2br(e($details), false);
+    return (string) preg_replace('/(?<![\w&#])[A-Za-z0-9][A-Za-z0-9\-]{7,}/', '<span class="gi-method__token">$0</span>', $html);
 };
 
 /* A rough icon per donation method, from its name (bank account, wallet, link). */
@@ -175,7 +169,7 @@ $volunteerForm = wa_form([
             <h4 class="gi-method__title" id="<?= e($mid) ?>-title"><?= e($m['title']) ?></h4>
           </div>
           <?php if ($m['details'] !== ''): ?>
-          <div class="gi-method__details" id="<?= e($mid) ?>"><?= nl2br(e($m['details']), false) ?></div>
+          <div class="gi-method__details" id="<?= e($mid) ?>"><?= $methodDetails($m['details']) ?></div>
           <?php endif; ?>
           <?php if ($m['details'] !== '' || $m['link'] !== ''): ?>
           <div class="gi-method__actions">
@@ -223,7 +217,7 @@ $volunteerForm = wa_form([
 <section class="section gi-section gi-projects" id="projects" aria-labelledby="projects-title">
   <div class="container">
     <div class="gi-projects__top">
-      <?= $head('projects', (string) t('get_involved.projects.title'), (string) t('get_involved.projects.text')) ?>
+      <?= $head('projects', (string) t('get_involved.projects.title'), (string) t($canDonate ? 'get_involved.projects.text_enabled' : 'get_involved.projects.text')) ?>
       <div class="actions gi-projects__more">
         <?= btn(t('get_involved.projects.more'), 'achievements.html#projects', 'outline', ['icon_end' => 'arrow-left']) ?>
         <?php if ($canDonate): ?>

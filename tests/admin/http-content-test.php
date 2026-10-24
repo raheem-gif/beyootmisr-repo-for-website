@@ -390,7 +390,21 @@ $r = $adm->post($A . '?p=projects&id=' . $pid, project_form($proj4, $rev, ['show
 check(strpos($r['body'], 'اكتب التكلفة أو التبرعات') !== false, 'show financials needs a value');
 $r = $adm->post($A . '?p=projects&id=' . $pid, project_form($proj4, $rev, ['updated_at' => '2999-01-01', 'activity' => 'nope']));
 check(strpos($r['body'], 'في المستقبل') !== false && strpos($r['body'], '«النشاط»') !== false, 'future date and unknown activity rejected');
+// §12 «كل مشروع له حالة وتاريخ آخر تحديث»: a published project needs its update date.
+$r = $adm->post($A . '?p=projects&id=' . $pid, project_form($proj4, $rev, ['updated_at' => '', 'summary' => 'ملخص كُتب قبل رفض النشر']));
+check($r['status'] === 200 && strpos($r['body'], 'لا يُنشر المشروع دون «تاريخ آخر تحديث»') !== false, 'publishing without «تاريخ آخر تحديث» rejected', flash_text($r['body']));
+check(strpos($r['body'], 'ملخص كُتب قبل رفض النشر') !== false && preg_match('/name="published"[^>]*checked/', $r['body']) === 1, 'typed values (summary, «نشر») kept in the form');
 check(find_by(json_file($content . '/projects.json.php'), 'id', $pid) === $proj4, 'nothing saved by the rejected attempts');
+// The example project ships as an undated draft: it cannot be published until dated, but stays editable as a draft.
+$draft = find_by(json_file($content . '/projects.json.php'), 'id', 'masjid-sayedna-isa-el-tor');
+$r = $adm->get($A . '?p=projects&id=masjid-sayedna-isa-el-tor');
+$draftRev = rev_of($r['body']);
+$r = $adm->post($A . '?p=projects&id=masjid-sayedna-isa-el-tor', project_form($draft, $draftRev, ['published' => '1', 'goal' => 'هدف كُتب قبل التأريخ']));
+check($r['status'] === 200 && strpos($r['body'], 'لا يُنشر المشروع دون') !== false && strpos($r['body'], 'هدف كُتب قبل التأريخ') !== false
+    && find_by(json_file($content . '/projects.json.php'), 'id', 'masjid-sayedna-isa-el-tor') === $draft && !is_file($SITE . '/projects/masjid-sayedna-isa-el-tor.html'),
+    'the undated example project cannot be published; nothing saved, no page');
+$r = $adm->post($A . '?p=projects&id=masjid-sayedna-isa-el-tor', project_form($draft, $draftRev));
+check($r['status'] === 303 && empty(find_by(json_file($content . '/projects.json.php'), 'id', 'masjid-sayedna-isa-el-tor')['published']), 'an undated draft can still be saved', flash_text($r['body']));
 
 $r = $adm->post($A . '?p=projects&id=' . $pid, project_form($proj4, $rev, ['status' => 'done', 'done_confirmed' => '1', 'slug' => 'Roof Test', 'cost' => '٢٥٠٠٠٠', 'show_financials' => '1']));
 check($r['status'] === 303 && strpos($r['location'], 'id=roof-test') !== false, 'done with confirmation + slug «Roof Test» → roof-test', $r['location'] . ' ' . flash_text($r['body']));
@@ -647,7 +661,8 @@ $left = array_filter($paths, function ($p) use ($SITE) {
     return is_file($SITE . '/' . $p);
 });
 check(!$left && !is_file($SITE . '/projects/' . $pid . '.html'), 'its photos, thumbnails and page are removed', implode(', ', $left));
-check(is_file($SITE . '/projects/masjid-sayedna-isa-el-tor.html'), 'other projects untouched');
+$other = find_by(json_file($content . '/projects.json.php'), 'id', 'masjid-sayedna-isa-el-tor');
+check($other !== null && (empty($other['published']) || is_file($SITE . '/projects/masjid-sayedna-isa-el-tor.html')), 'other projects untouched (record kept; page kept when published)');
 $audit = (string) file_get_contents($storage . '/audit.php');
 foreach (['stats.save', 'projects.save', 'projects.stage', 'projects.stage_delete', 'projects.delete', 'stories.create', 'stories.delete', 'reports.create', 'reports.delete', 'galleries.upload', 'galleries.delete'] as $act) {
     check(strpos($audit, '"' . $act . '"') !== false, "audit has $act");

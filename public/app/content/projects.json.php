@@ -15,7 +15,7 @@
     "cost": "",
     "donations": "",
     "show_financials": false,
-    "published": true,
+    "published": false,
     "created_at": "2026-10-23"
   }
 ]

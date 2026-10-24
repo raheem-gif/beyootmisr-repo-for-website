@@ -157,7 +157,7 @@
 /* Call button with the hotline number */
 .tpl-get-involved .gi-call { flex-wrap: wrap; row-gap: 0.1rem; white-space: normal; }
 .tpl-get-involved .gi-call .num { font-weight: 800; white-space: nowrap; }
-.tpl-get-involved .btn--primary.gi-call .num { color: var(--amber-100); }
+.tpl-get-involved .btn--primary.gi-call .num { color: var(--amber-50); } /* 4.9:1 on blue-700 */
 
 /* ---------- 1. Donate ---------- */
 .tpl-get-involved .gi-donate__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
@@ -260,11 +260,13 @@
 
 /* Official donation methods (when enabled) */
 .tpl-get-involved .gi-methods-wrap { margin-block-start: clamp(2rem, 1.5rem + 2vw, 3rem); }
-.tpl-get-involved .gi-methods { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+/* Two columns only where a card is wide enough to hold an IBAN on one line (one column on tablets). */
+.tpl-get-involved .gi-methods { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
 .tpl-get-involved .gi-methods--single { max-inline-size: 600px; }
 .tpl-get-involved .gi-methods > li { display: flex; min-inline-size: 0; }
 .tpl-get-involved .gi-method {
   flex: 1;
+  min-inline-size: 0;
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
@@ -297,7 +299,13 @@
   font-weight: 700;
   line-height: 1.9;
   font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  overflow-x: auto; /* safety net: a token longer than the box scrolls instead of being split */
+}
+/* Account numbers / IBANs stay in one piece; the line breaks before them instead. */
+.tpl-get-involved .gi-method__token { white-space: nowrap; }
+@media (max-width: 359px) {
+  .tpl-get-involved .gi-method__details { padding-inline: 0.6rem; font-size: var(--fs-xs); }
 }
 @media (min-width: 560px) {
   .tpl-get-involved .gi-method { padding: 1.35rem 1.3rem 1.3rem; }
@@ -333,7 +341,11 @@
 }
 
 /* ---------- 3. Projects ---------- */
-.tpl-get-involved .gi-projects__top { display: grid; gap: 1.25rem; margin-block-end: clamp(1.5rem, 1rem + 1.5vw, 2.25rem); }
+.tpl-get-involved .gi-projects__top { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; margin-block-end: clamp(1.5rem, 1rem + 1.5vw, 2.25rem); }
+@media (max-width: 399px) {
+  /* «تابع المشروعات ومراحل تنفيذها» is wider than a 320px screen: let it wrap */
+  .tpl-get-involved .gi-projects__more .btn { white-space: normal; }
+}
 @media (min-width: 960px) {
   .tpl-get-involved .gi-projects__top { grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 2rem; }
 }

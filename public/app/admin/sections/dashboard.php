@@ -10,7 +10,7 @@ if (strtoupper((string) $_SERVER['REQUEST_METHOD']) === 'POST') {
     if ($action === 'rebuild' && adm_can($user, 'rebuild')) {
         try {
             $report = adm_rebuild('site.rebuild');
-            adm_audit('site.rebuild', (int) $report['pages'] . ' صفحة');
+            adm_audit('site.rebuild', adm_plural((int) $report['pages'], 'صفحة واحدة', 'صفحتان', 'صفحات', 'صفحة'));
             adm_flash('success', adm_build_summary($report));
         } catch (AdmUserError $e) {
             adm_flash('error', $e->getMessage(), $e->details);
@@ -72,7 +72,7 @@ foreach ([
     ['social', 'facebook', 'صفحة فيسبوك'],
     ['social', 'instagram', 'صفحة إنستجرام'],
     ['contact', 'address_detail', 'العنوان التفصيلي'],
-    ['contact', 'hours', 'مواعيد العمل'],
+    ['contact', 'hours', 'ساعات استقبال الرسائل'],
 ] as [$grp, $k, $l]) {
     if (trim((string) $settings[$grp][$k]) === '') {
         $contactMissing[] = $l;
@@ -166,7 +166,7 @@ $stat = function (string $label, string $value, string $sub, string $iconName, s
   } else {
       $buildBody .= '<p class="adm-build ' . (!empty($build['ok']) ? 'is-ok' : 'is-error') . '">'
           . adm_icon(!empty($build['ok']) ? 'circle-check' : 'circle-alert')
-          . '<span>' . (!empty($build['ok']) ? 'تم بنجاح: ' . (int) $build['pages'] . ' صفحة' . ((int) $build['written'] > 0 ? '، تحدّث ' . (int) $build['written'] . ' ملف' : '') : 'فشل آخر تحديث للموقع') . '</span></p>'
+          . '<span>' . (!empty($build['ok']) ? 'تم بنجاح: ' . adm_plural((int) $build['pages'], 'صفحة واحدة', 'صفحتان', 'صفحات', 'صفحة') . ((int) $build['written'] > 0 ? '، تحدّث ' . adm_plural((int) $build['written'], 'ملف واحد', 'ملفان', 'ملفات', 'ملفًا') : '') : 'فشل آخر تحديث للموقع') . '</span></p>'
           . '<p class="adm-muted">' . e(adm_time((int) ($build['t'] ?? 0))) . (($build['u'] ?? '') !== '' ? ' — ' . e((string) $build['u']) : '')
           . (($build['reason'] ?? '') !== '' ? ' · ' . e(adm_audit_label((string) $build['reason'])) : '') . '</p>';
       if (empty($build['ok']) && !empty($build['error'])) {

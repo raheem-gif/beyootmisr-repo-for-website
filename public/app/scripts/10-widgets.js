@@ -68,9 +68,15 @@
       var opt = topicSel ? topicSel.options[topicSel.selectedIndex] : null;
       var legal = opt && opt.getAttribute("data-legal") === "1";
       var topic = opt ? opt.text.trim() : "";
-      var text = (form.elements.text && form.elements.text.value || "").trim();
+      var field = form.elements.text;
+      var text = (field && field.value || "").trim();
       if (!text) {
-        form.elements.text.focus();
+        // Spaces only: clear them so the browser shows its usual "required" message.
+        if (field) {
+          field.value = "";
+          if (field.reportValidity) field.reportValidity();
+          else field.focus();
+        }
         return;
       }
       var lines = [form.getAttribute("data-greeting")];
@@ -79,8 +85,14 @@
       lines.push("", text);
       var number = legal && form.getAttribute("data-wa-legal") ? form.getAttribute("data-wa-legal") : form.getAttribute("data-wa-general");
       var url = "https://wa.me/" + number + "?text=" + encodeURIComponent(lines.join("\n"));
-      var win = window.open(url, "_blank", "noopener");
-      if (!win) window.location.href = url;
+      // No "noopener" feature here: with it window.open() always returns null, which
+      // looked like a blocked pop-up and opened WhatsApp a second time in this tab.
+      var win = window.open(url, "_blank");
+      if (win) {
+        try { win.opener = null; } catch (err) { /* cross-origin: nothing to clear */ }
+      } else {
+        window.location.href = url;
+      }
     });
   });
 

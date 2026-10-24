@@ -18,8 +18,9 @@ const exe = process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium-1243/chrome-
   await page.setViewportSize({ width: 1200, height: 630 });
   await page.goto('file://' + path.join(root, 'index.html'));
   const svg = await page.$eval('.skyline', el => el.outerHTML);
-  const css = 'file://' + path.join(root, 'assets/css/site.css');
-  await page.setContent(`<!doctype html><html lang="ar" dir="rtl"><head><link rel="stylesheet" href="${css}"><style>
+  // core.css carries the font and tokens; home.css the skyline colours.
+  const css = ['core', 'home'].map(n => `<link rel="stylesheet" href="file://${path.join(root, 'assets/css', n + '.css')}">`).join('');
+  await page.setContent(`<!doctype html><html lang="ar" dir="rtl"><head>${css}<style>
     body{margin:0;width:1200px;height:630px;overflow:hidden;background:linear-gradient(180deg,#EEF6FB,#fff);display:grid;grid-template-columns:1.1fr .9fr;align-items:end;font-family:Cairo}
     .t{padding:0 72px 96px 24px} .t p{color:#1572A6;font-weight:700;font-size:28px;margin:0 0 12px}
     .t h1{font-size:64px;line-height:1.25;color:#1984C0;margin:0} .t h2{font-size:30px;color:#122A3D;margin:18px 0 0;font-weight:700}

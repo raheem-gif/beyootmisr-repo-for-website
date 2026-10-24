@@ -23,20 +23,13 @@
 .home-hero__title span { display: block; color: var(--ink); }
 .home-hero__text { margin-block-start: 1.25rem; font-size: clamp(1.1rem, 1rem + 0.45vw, 1.3rem); line-height: 1.9; color: var(--ink-2); max-inline-size: 58ch; }
 .home-hero .actions { margin-block-start: 1.75rem; }
+/* Phones: three full-width buttons; tablets/laptops: buttons share each row evenly. */
+@media (max-width: 559px) { .home-hero .actions .btn { flex: 1 1 100%; } }
+@media (min-width: 560px) and (max-width: 1279px) { .home-hero .actions .btn { flex: 1 1 auto; } }
 .home-hero__art { position: relative; margin-inline: -4%; margin-block-end: -1px; }
 .home-hero__art svg { overflow: visible; }
 .home-hero__art svg { inline-size: 100%; block-size: auto; }
 @media (max-width: 959px) { .home-hero__art { max-inline-size: 560px; margin-inline: auto; } }
-
-/* Skyline illustration */
-.skyline .dim { fill: var(--blue-800); }
-.skyline path.dim, .skyline rect.dim { fill: #2B6E98; }
-.skyline .lit { fill: var(--amber); animation: light-up 0.7s var(--ease) both; animation-delay: var(--d, 0s); }
-@keyframes light-up {
-  0% { fill: #2B6E98; }
-  60% { fill: #FFE3A3; }
-  100% { fill: var(--amber); }
-}
 
 /* Intro (تعريف قصير) */
 .intro-card {
@@ -67,7 +60,10 @@
 @media (max-width: 899px) { .fact { white-space: normal; } }
 
 /* كل بيت.. له حكاية */
-.homes { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
+/* Four tiles: 1 → 2×2 → one row of four (never 3 + 1). */
+.homes { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 560px) { .homes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .homes { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .home-tile {
   position: relative;
   padding: 1.5rem 1.35rem 1.35rem;
@@ -102,10 +98,14 @@
 .home-tile__icon .icon { inline-size: 26px; block-size: 26px; }
 .home-tile p { font-size: var(--fs-md); font-weight: 700; color: var(--ink); line-height: 1.7; }
 .homes-closing { margin-block-start: 2rem; text-align: center; }
-.homes-closing .tagline { font-size: var(--fs-xl); }
+/* A narrow, centred block with start-aligned text keeps the amber bar next to the words when the line wraps. */
+.homes-closing .tagline { max-inline-size: 34ch; font-size: var(--fs-xl); text-align: start; }
 
 /* Activities on home */
-.activities-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); }
+/* Ten activities: 1 → 2 × 5 → 5 × 2 (no orphan last row). */
+.activities-grid { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 560px) { .activities-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .activities-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
 .home-activities .initiative-card { margin-block-start: 1.25rem; }
 .home-activities__more { margin-block-start: 2rem; text-align: center; }
 

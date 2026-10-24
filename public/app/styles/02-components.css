@@ -78,6 +78,17 @@
 .section-head--center { margin-inline: auto; text-align: center; }
 .section-head--center .eyebrow { justify-content: center; }
 .section-title { font-size: var(--fs-2xl); color: var(--ink); }
+/* Short amber bar under a section title (section_head(['bar' => true]) or class="section-title section-title--bar"). */
+.section-title--bar::after {
+  content: "";
+  display: block;
+  inline-size: 56px;
+  block-size: 5px;
+  margin-block-start: 0.85rem;
+  border-radius: 5px;
+  background: var(--amber);
+}
+.section-head--center .section-title--bar::after { margin-inline: auto; }
 .section-lead { margin-block-start: 0.9rem; font-size: var(--fs-md); color: var(--ink-2); }
 .section-head .actions { margin-block-start: 1.5rem; }
 
@@ -377,23 +388,32 @@
 .initiative-card .eyebrow { margin-block-end: 0.3rem; }
 .initiative-card__title { color: var(--white); font-size: var(--fs-xl); }
 .initiative-card__title a { color: inherit; text-decoration: none; }
-.initiative-card__subtitle { color: var(--amber-300); font-weight: 700; margin-block-start: 0.2rem; }
-.initiative-card__text { margin-block-start: 0.5rem; color: var(--blue-100); }
-.initiative-card__more {
-  display: none;
+/*
+ * amber-100, not amber-300 (3.2:1 where the subtitle crosses the amber glow). Sampled under the
+ * glyphs at 360–1440 px: ≥ 4.6:1 — on narrow cards the text runs into the glow's corner, so
+ * there the glow sits further out (below).
+ */
+.initiative-card__subtitle { color: var(--amber-100); font-weight: 700; margin-block-start: 0.2rem; }
+@media (max-width: 639px) {
+  .initiative-card::before { inset-block-start: -110px; inset-inline-end: -100px; }
 }
+.initiative-card__text { margin-block-start: 0.5rem; color: var(--blue-100); }
+/* The arrow tells visitors the whole card is a link (phones: a small one under the text). */
+.initiative-card__more {
+  grid-column: 2;
+  justify-self: end;
+  display: grid;
+  place-items: center;
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  transition: background-color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.initiative-card:hover .initiative-card__more { background: var(--amber); color: var(--ink); transform: translateX(-4px); }
 @media (min-width: 720px) {
   .initiative-card { grid-template-columns: auto 1fr auto; }
-  .initiative-card__more {
-    display: grid;
-    place-items: center;
-    inline-size: 52px;
-    block-size: 52px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.12);
-    transition: background-color 0.2s var(--ease), transform 0.2s var(--ease);
-  }
-  .initiative-card:hover .initiative-card__more { background: var(--amber); color: var(--ink); transform: translateX(-4px); }
+  .initiative-card__more { grid-column: auto; justify-self: auto; inline-size: 52px; block-size: 52px; }
 }
 
 /* Media (project/story cards) */
@@ -441,6 +461,8 @@
   transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
 .project-card:hover, .story-card:hover, .project-card:focus-within, .story-card:focus-within { transform: translateY(-4px); box-shadow: var(--shadow); }
+/* In a list (grid row) every card fills its cell, so cards side by side share one height. */
+li > .activity-card, li > .project-card, li > .story-card { block-size: 100%; }
 .project-card:hover .card-media__img, .story-card:hover .card-media__img { transform: scale(1.04); }
 .project-card__body, .story-card__body { display: flex; flex-direction: column; flex: 1; gap: 0.45rem; padding: 1.15rem 1.25rem 1.25rem; }
 .project-card__activity { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--blue-700); font-weight: 700; font-size: var(--fs-sm); }
@@ -464,6 +486,10 @@
 
 /* ---------- Stats ---------- */
 .stats-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+/* Exactly four cards (the home page default): 1 → 2×2 → one row of four, never 3 + 1. */
+.stats-grid:has(> :nth-child(4):last-child) { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 560px) { .stats-grid:has(> :nth-child(4):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .stats-grid:has(> :nth-child(4):last-child) { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .stat {
   position: relative;
   padding: 1.4rem 1.3rem;
@@ -513,9 +539,16 @@
 /* Lightbox (built by site.js) */
 .lightbox { padding: 0; border: 0; background: transparent; max-inline-size: 100vw; max-block-size: 100vh; inline-size: 100%; block-size: 100%; }
 .lightbox::backdrop { background: rgba(10, 24, 36, 0.9); }
-.lightbox__inner { display: grid; place-items: center; block-size: 100%; padding: 56px 12px 72px; }
-.lightbox img { max-block-size: calc(100vh - 140px); max-inline-size: 100%; inline-size: auto; border-radius: var(--radius-sm); }
+/* Room is reserved for the caption and the controls, so neither covers the other:
+   phones keep previous/next under the photo; wider screens put them at the sides. */
+.lightbox__inner { display: grid; place-items: center; block-size: 100%; padding: 64px 12px 80px; }
+.lightbox figure { margin: 0; }
+.lightbox img { max-block-size: calc(100vh - 200px); max-block-size: calc(100dvh - 200px); max-inline-size: 100%; inline-size: auto; margin-inline: auto; border-radius: var(--radius-sm); }
 .lightbox__caption { margin-block-start: 0.75rem; color: var(--white); text-align: center; }
+@media (min-width: 640px) {
+  .lightbox__inner { padding: 64px 72px 16px; }
+  .lightbox img { max-block-size: calc(100vh - 150px); max-block-size: calc(100dvh - 150px); }
+}
 .lightbox__btn {
   position: fixed;
   display: grid;
@@ -531,6 +564,11 @@
 .lightbox__close { inset-block-start: 12px; inset-inline-end: 12px; }
 .lightbox__prev { inset-block-end: 16px; inset-inline-start: calc(50% - 56px); }
 .lightbox__next { inset-block-end: 16px; inset-inline-start: calc(50% + 8px); }
+@media (min-width: 640px) {
+  .lightbox__prev, .lightbox__next { inset-block: 50% auto; transform: translateY(-50%); }
+  .lightbox__prev { inset-inline-start: 12px; }
+  .lightbox__next { inset-inline-start: auto; inset-inline-end: 12px; }
+}
 
 /* ---------- Forms ---------- */
 .field { display: grid; gap: 0.35rem; }
@@ -540,7 +578,7 @@
   inline-size: 100%;
   min-block-size: 48px;
   padding: 0.6rem 0.9rem;
-  border: 1.5px solid var(--line-2);
+  border: 1.5px solid var(--slate-2); /* 3.7:1 — the field outline must be visible (WCAG 1.4.11) */
   border-radius: var(--radius-sm);
   background: var(--white);
   font-size: var(--fs-base);
@@ -595,7 +633,9 @@
   border-block-end: 1px solid var(--line);
   isolation: isolate;
 }
-.page-hero__deco { position: absolute; inset-block: 0; inset-inline-end: 0; inline-size: min(46%, 520px); z-index: -1; opacity: 0.6; -webkit-mask-image: linear-gradient(to left, #000 30%, transparent); mask-image: linear-gradient(to left, #000 30%, transparent); }
+/* The pattern sits at the inline end (left in RTL) and fades out toward the content. */
+.page-hero__deco { position: absolute; inset-block: 0; inset-inline-end: 0; inline-size: min(46%, 520px); z-index: -1; opacity: 0.6; -webkit-mask-image: linear-gradient(to right, #000 30%, transparent); mask-image: linear-gradient(to right, #000 30%, transparent); }
+[dir="ltr"] .page-hero__deco { -webkit-mask-image: linear-gradient(to left, #000 30%, transparent); mask-image: linear-gradient(to left, #000 30%, transparent); }
 .page-hero__deco svg { inline-size: 100%; block-size: 100%; }
 .page-hero__deco .w { fill: var(--blue-100); }
 .page-hero__deco .w-lit { fill: var(--amber-100); }
@@ -656,7 +696,9 @@
 .cta-band__title { color: var(--white); font-size: var(--fs-2xl); }
 .cta-band__text p { margin-block-start: 0.9rem; color: var(--blue-100); font-size: var(--fs-md); }
 .cta-band__ways { display: grid; gap: 0.75rem; }
-@media (min-width: 560px) { .cta-band__ways { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Two buttons per row only where a label fits on one line: 640–959 (band stacked) and ≥ 1280. */
+@media (min-width: 640px) { .cta-band__ways { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 960px) and (max-width: 1279px) { .cta-band__ways { grid-template-columns: minmax(0, 1fr); } }
 .way {
   display: flex;
   align-items: center;
@@ -677,6 +719,16 @@
 .cta-band__ways li:first-child .way { background: var(--amber); border-color: var(--amber); color: var(--ink); }
 .cta-band__ways li:first-child .way > .icon:first-child { color: var(--ink); }
 .cta-band__ways li:first-child .way:hover { background: var(--amber-600); }
+
+/* ---------- Skyline illustration (home hero, 404 page) ---------- */
+.skyline .dim { fill: var(--blue-800); }
+.skyline path.dim, .skyline rect.dim { fill: #2B6E98; }
+.skyline .lit { fill: var(--amber); animation: light-up 0.7s var(--ease) both; animation-delay: var(--d, 0s); }
+@keyframes light-up {
+  0% { fill: #2B6E98; }
+  60% { fill: #FFE3A3; }
+  100% { fill: var(--amber); }
+}
 
 /* ---------- Quote band (charter) ---------- */
 .quote-band { padding-block: clamp(2.25rem, 1.5rem + 3vw, 3.5rem); background: var(--amber-50); border-block: 1px solid var(--amber-100); }

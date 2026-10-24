@@ -62,6 +62,12 @@ EDITORIAL = [
     'تُدرج هنا بيانات جهة الإشهار',                   # "insert the registration details here" (developer note)
     'الرسمية للنفع العام وتصاريح جمع التبرعات، بالنص المطابق',
 ]
+# Copy that renders only when the content has data for it; reported as "data-driven"
+# (not missing) while absent. Each must be justified.
+DATA_DRIVEN = [
+    'ساهم في هذا المشروع',   # §11 project-page buttons: a project page exists only for a published
+    'شاهد مراحل المشروع',    # project, i.e. once it is documented (§08 «قابل للعرض بعد التوثيق»)
+]
 STORY_GUIDES = ['عنوان المشروع أو نوع التدخل', 'المريض.', 'نوع مشروع متناهي الصغر', 'صور التنفيذ قبل/أثناء/بعد',
                 'نوع الدعم التعليمي والنتيجة العامة', 'اسم المشروع العام وموقعه العام']
 
@@ -119,7 +125,7 @@ def site_text():
 
 def main():
     site = site_text()
-    missing, editorial, gray = [], 0, 0
+    missing, editorial, gray, data_driven = [], 0, 0, []
     dev_section = False
     for raw in open(SRC, encoding='utf-8'):
         m = re.match(r'\[([^|\]]*)\|[^\]]*\]\s?(.*)', raw.strip())
@@ -149,8 +155,13 @@ def main():
         # site may show in separate cards: accept it when every sentence part is present.
         parts = [squash(norm(x)) for x in re.split(r'[.؟]\s+', text) if len(norm(x).split(' ')) >= 3]
         if not parts or any(part not in site for part in parts):
-            missing.append(text)
+            if any(x in text for x in DATA_DRIVEN):
+                data_driven.append(text)
+            else:
+                missing.append(text)
     print(f'checked document lines; editorial skipped: {editorial}; gray notes skipped: {gray}; missing: {len(missing)}')
+    for line in data_driven:
+        print('  DATA-DRIVEN (shown once a project is published)', line)
     for line in missing:
         print('  MISSING', line)
     return 1 if missing else 0

@@ -114,6 +114,10 @@ $r = $b->request('POST', $A, ['action' => 'rebuild', '_csrf' => 'deadbeef']);
 check($r['status'] === 400, 'wrong CSRF token → 400');
 $r = $b->request('POST', $A, ['action' => 'rebuild', '_csrf' => $tok], ['Origin: https://evil.example']);
 check($r['status'] === 400, 'cross-site Origin → 400');
+$r = $b->request('POST', $A, ['action' => 'rebuild', '_csrf' => $tok], ['Origin: https://evil.example', 'X-Forwarded-Host: evil.example']);
+check($r['status'] === 400, 'cross-site Origin + forged X-Forwarded-Host → 400 (header not trusted)', (string) $r['status']);
+$r = $b->request('POST', $A, ['action' => 'rebuild', '_csrf' => $tok], ['Referer: https://evil.example/page', 'X-Forwarded-Host: evil.example']);
+check($r['status'] === 400, 'cross-site Referer + forged X-Forwarded-Host → 400', (string) $r['status']);
 $r = $b->request('POST', $A, ['action' => 'rebuild', '_csrf' => $tok], ['Origin: ' . $BASE]);
 check($r['status'] === 303, 'same Origin + token → accepted');
 $r = $b->follow();
@@ -226,6 +230,53 @@ check(strpos($r['body'], 'فشل آخر تحديث للموقع') !== false, 'da
 $b->post($A, ['action' => 'rebuild']);
 
 /* ====================================================================== */
+section('Texts editor: keys shipped only in texts-defaults (code update)');
+// A server whose texts.json predates a code update: it lacks a key and a whole group that the
+// update's app/lib/texts-defaults.json.php (tools/package.sh) carries.
+$guard = "<?php exit; ?>\n";
+$enc = function ($d): string {
+    return (string) json_encode($d, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+};
+$texts = json_file($content . '/texts.json.php');
+$defaultsFile = $SITE . '/app/lib/texts-defaults.json.php';
+$oldServer = $texts;
+unset($oldServer['activities']['inquiry_title'], $oldServer['not_found']);
+file_put_contents($defaultsFile, $guard . $enc($texts));
+file_put_contents($content . '/texts.json.php', $guard . $enc($oldServer));
+$formHash = function (string $html, string $group): string {
+    return preg_match('/id="g-' . preg_quote($group, '/') . '".*?name="h" value="([a-f0-9]{40})"/s', $html, $m) ? $m[1] : '';
+};
+$r = $b->get($A . '?p=texts');
+check(strpos($r['body'], 'data-key="activities.inquiry_title"') !== false && strpos($r['body'], 'id="g-not_found"') !== false && strpos($r['body'], 'data-key="not_found.links_title"') !== false,
+    'a key and a whole group found only in texts-defaults are listed in the editor');
+$hAct = $formHash($r['body'], 'activities');
+$r = $b->post($A . '?p=texts', ['group' => 'activities', 'h' => $hAct, 't' => ['inquiry_title' => $texts['activities']['inquiry_title']]]);
+$r = $b->follow();
+check(strpos($r['body'], 'لم تتغير أي نصوص') !== false && json_file($content . '/texts.json.php') === $oldServer, 'saving without an edit writes nothing (default keys are not copied on their own)', flash_text($r['body']));
+$newInquiry = 'استفسر عن هذا النشاط (من القيم الافتراضية)';
+$r = $b->post($A . '?p=texts', ['group' => 'activities', 'h' => $hAct, 't' => ['inquiry_title' => $newInquiry]]);
+check($r['status'] === 303, 'default-only key accepted by the structure check and saved', $r['status'] . ' ' . flash_text($r['body']));
+$after = json_file($content . '/texts.json.php');
+check(($after['activities']['inquiry_title'] ?? '') === $newInquiry && $after['activities']['items'] === $oldServer['activities']['items'], 'texts.json now holds the edited key; the rest of the group is unchanged');
+check(strpos((string) file_get_contents($SITE . '/activities/afrah.html'), $newInquiry) !== false, 'activity pages rebuilt with the edited default key');
+$auditLines = array_filter(explode("\n", (string) file_get_contents($storage . '/audit.php')), 'strlen');
+$lastAudit = (array) json_decode((string) end($auditLines), true);
+check(($lastAudit['a'] ?? '') === 'texts.save' && strpos((string) ($lastAudit['d'] ?? ''), '(activities.inquiry_title)') !== false, 'audit names only the edited default key', (string) ($lastAudit['d'] ?? ''));
+$r = $b->get($A . '?p=texts');
+$hNf = $formHash($r['body'], 'not_found');
+$r = $b->post($A . '?p=texts', ['group' => 'not_found', 'h' => $hNf, 't' => ['title' => 'x', 'evil' => 'y']]);
+check($r['status'] === 200 && strpos($r['body'], 'حقل غير معروف') !== false && !isset(json_file($content . '/texts.json.php')['not_found']), 'unknown keys are still rejected in a default-only group');
+$r = $b->post($A . '?p=texts', ['group' => 'not_found', 'h' => $hNf, 't' => ['title' => 'هذه الصفحة غير موجودة']]);
+$after = json_file($content . '/texts.json.php');
+check($r['status'] === 303 && ($after['not_found']['title'] ?? '') === 'هذه الصفحة غير موجودة' && ($after['not_found']['_label'] ?? '') === $texts['not_found']['_label']
+    && ($after['not_found']['links_title'] ?? '') === $texts['not_found']['links_title'], 'a group found only in texts-defaults is saved whole (label and other keys kept)');
+check(strpos((string) file_get_contents($SITE . '/404.html'), 'هذه الصفحة غير موجودة') !== false, '404 page rebuilt with the edited default group');
+// Back to the original texts, without the defaults file (as on a full install).
+unlink($defaultsFile);
+file_put_contents($content . '/texts.json.php', $guard . $enc($texts));
+$b->post($A, ['action' => 'rebuild']);
+
+/* ====================================================================== */
 section('Settings');
 $settings = json_file($content . '/settings.json.php');
 $settings['extra_key_from_developer'] = ['keep' => 'me'];
@@ -252,6 +303,8 @@ $s2 = json_file($content . '/settings.json.php');
 check($s2['site_url'] === 'https://www.beyootmisr.org' && $s2['contact']['email'] === 'info@beyootmisr.org' && $s2['contact']['hotline'] === '01211114662', 'values normalised (trailing slash, Arabic digits)');
 check(($s2['extra_key_from_developer']['keep'] ?? '') === 'me', 'unknown settings keys preserved');
 check(strpos((string) file_get_contents($SITE . '/sitemap.xml'), 'https://www.beyootmisr.org/') !== false, 'site_url enables sitemap on rebuild');
+$r = $b->request('POST', $A, ['action' => 'rebuild', '_csrf' => $b->csrf()], ['Origin: https://www.beyootmisr.org']);
+check($r['status'] === 303, 'Origin = the configured site address (proxy that rewrites Host) → accepted', (string) $r['status']);
 $method = ['title' => 'حساب بنكي باسم المؤسسة', 'details' => 'بنك مصر — رقم الحساب 123', 'link' => '', 'note' => ''];
 $r = $b->post($A . '?p=settings', $form(['donations' => ['enabled' => '1']]));
 check(strpos($r['body'], 'لا يمكن تفعيل التبرع') !== false, 'donations cannot be enabled without methods');
@@ -264,6 +317,16 @@ check(!empty($s3['donations']['enabled']) && $s3['donations']['methods'] === [$m
 check(!isset($s3['donations']['verified']), 'confirmation checkbox is not stored');
 $r = $b->post($A . '?p=settings', $form(['donations' => ['methods' => [0 => ['title' => 'رابط', 'details' => '', 'link' => 'data:text/html,x', 'note' => '']]]]));
 check(strpos($r['body'], 'https://') !== false && json_file($content . '/settings.json.php') === $s3, 'non-http donation link rejected');
+// The site shows official https:// donation links only (bm_donation_methods()), so the form accepts nothing else.
+$httpLink = ['title' => 'رابط التبرع الإلكتروني', 'details' => '', 'link' => 'http://pay.example.org/beyoot', 'note' => ''];
+$r = $b->post($A . '?p=settings', $form(['donations' => ['enabled' => '1', 'verified' => '1', 'methods' => [5 => $method, 7 => $httpLink]]]));
+check($r['status'] === 200 && strpos($r['body'], 'يُقبل رابط التبرع الآمن فقط') !== false && json_file($content . '/settings.json.php') === $s3, 'http:// donation link rejected with a clear Arabic message, nothing saved', flash_text($r['body']));
+check(strpos($r['body'], 'value="http://pay.example.org/beyoot"') !== false && strpos($r['body'], 'أدخل بيانات الوسيلة رقم 2') === false, 'typed link shown again for correction, without a second misleading error');
+$r = $b->post($A . '?p=settings', $form(['donations' => ['enabled' => '1', 'verified' => '1', 'methods' => [5 => $method, 7 => ['link' => 'https://pay.example.org/beyoot'] + $httpLink]]]));
+check($r['status'] === 303 && (json_file($content . '/settings.json.php')['donations']['methods'][1]['link'] ?? '') === 'https://pay.example.org/beyoot', 'https:// donation link accepted', flash_text($r['body']));
+check(strpos((string) file_get_contents($SITE . '/get-involved.html'), 'https://pay.example.org/beyoot') !== false, 'and shown on «شارك في الخير»');
+$r = $b->post($A . '?p=settings', $form(['donations' => ['enabled' => '1', 'verified' => '1', 'methods' => [5 => $method]]]));
+check($r['status'] === 303 && json_file($content . '/settings.json.php')['donations'] === $s3['donations'], 'back to the single bank method');
 
 // Logo upload.
 $tmpdir = $WORK;

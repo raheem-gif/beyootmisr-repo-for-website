@@ -33,14 +33,26 @@ $isDone = $p['status'] === 'done';
 $cover = bm_project_cover($p);
 
 BM::$page['title'] = (string) $p['title'];
-BM::$page['description'] = excerpt($summary !== '' ? $summary : $description);
+/*
+ * A short summary (often just «مشروع مسجد…») makes a poor search snippet: build one from
+ * the data instead — «{المشروع} في {الموقع} — مشروع ضمن نشاط «{النشاط}» من مؤسسة بيوت مصر.»,
+ * leaving out the parts that are not filled in.
+ */
+if (bm_strlen($summary) >= 80) {
+    BM::$page['description'] = sentence_excerpt($summary, 200);
+} else {
+    $place = $location !== '' ? (string) t('project.meta_place', ['project' => $p['title'], 'location' => $location]) : (string) $p['title'];
+    BM::$page['description'] = $a
+        ? (string) t('project.meta_auto', ['project' => $place, 'activity' => $a['name']])
+        : (string) t('project.meta_auto_plain', ['project' => $place]);
+}
 if ($cover) {
     BM::$page['image'] = (string) $cover['src'];
 }
 
 $settings = bm_settings();
-$canDonate = !empty($settings['donations']['enabled']) && !empty($settings['donations']['methods']);
-$allocationNote = trim((string) ($settings['donations']['allocation_note'] ?? ''));
+$canDonate = bm_can_donate();
+$allocationNote = trim((string) $settings['donations']['allocation_note']);
 $hotline = trim((string) $settings['contact']['hotline']);
 $telLink = $hotline !== '' ? tel_href($hotline) : '';
 $waLink = wa_general((string) t('project.wa_message', ['project' => $p['title']]));
@@ -96,12 +108,18 @@ if ($updated !== '') {
 }
 $meta .= '</ul>';
 
-/* The two project buttons of §11. Without official donation methods, «ساهم» leads to the contact options below. */
+/*
+ * The two project buttons of §11: «ساهم» only where official donation methods are
+ * published (§05 «حيث تتاح مساهمات رسمية», §12), «شاهد مراحل المشروع» only when there
+ * are stages to see.
+ */
 $heroActions = '';
-if (!$isDone) {
-    $heroActions .= btn(t('buttons.contribute_project'), $canDonate ? 'get-involved.html#donate' : '#contribute', 'donate', ['icon' => 'hand-heart', 'size' => 'lg']);
+if (!$isDone && $canDonate) {
+    $heroActions .= btn(t('buttons.contribute_project'), 'get-involved.html#donate', 'donate', ['icon' => 'hand-heart', 'size' => 'lg']);
 }
-$heroActions .= btn(t('buttons.see_stages'), '#stages', $isDone ? 'primary' : 'outline', ['icon' => 'list-checks', 'size' => 'lg']);
+if ($p['updates']) {
+    $heroActions .= btn(t('buttons.see_stages'), '#stages', $isDone ? 'primary' : 'outline', ['icon' => 'list-checks', 'size' => 'lg']);
+}
 
 if ($cover) {
     $cover = $withAlt($cover, (string) $p['title']);
@@ -184,13 +202,16 @@ if ($p['updates']) {
 }
 $docsCompact = $showGallery && !$p['images'] && !$p['updates'];
 
-/* ---------- Contribute band: an ongoing project asks for itself; a completed one points to its activity ---------- */
+/*
+ * ---------- Contribute band: an ongoing project asks for itself; a completed one points to its activity.
+ * Until official donation methods are published it is an inquiry band, not a call to give.
+ */
 if (!$isDone) {
-    $band = ['eyebrow' => (string) $p['title'], 'title' => t('buttons.contribute_project'), 'text' => t($canDonate ? 'project.contribute_text' : 'project.contribute_pending'), 'link' => null];
+    $band = ['eyebrow' => (string) $p['title'], 'title' => t($canDonate ? 'buttons.contribute_project' : 'project.inquiry_title'), 'text' => t($canDonate ? 'project.contribute_text' : 'project.contribute_pending'), 'link' => null];
 } elseif ($a) {
-    $band = ['eyebrow' => $a['name'], 'title' => t('buttons.contribute_activity'), 'text' => t($canDonate ? 'activities.contribute_text' : 'activities.contribute_pending'), 'link' => [$a['name'], $a['url']]];
+    $band = ['eyebrow' => $a['name'], 'title' => t($canDonate ? 'buttons.contribute_activity' : 'activities.inquiry_title'), 'text' => t($canDonate ? 'activities.contribute_text' : 'activities.contribute_pending'), 'link' => [$a['name'], $a['url']]];
 } else {
-    $band = ['eyebrow' => (string) $p['title'], 'title' => t('buttons.support_activity'), 'text' => t('get_involved.projects.text'), 'link' => [t('nav.activities_all'), 'activities.html']];
+    $band = ['eyebrow' => (string) $p['title'], 'title' => t('buttons.support_activity'), 'text' => t($canDonate ? 'get_involved.projects.text_enabled' : 'get_involved.projects.text'), 'link' => [t('nav.activities_all'), 'activities.html']];
 }
 
 /* ---------- Other published projects ---------- */
@@ -264,7 +285,7 @@ $others = array_slice(array_values(array_filter($all, function ($x) use ($p) {
     <?php endif; ?>
     <section class="proj-doc proj-doc--stages" id="stages" aria-labelledby="stages-title">
       <h2 class="proj-doc__title" id="stages-title"><?= te('ui.stages_title') ?></h2>
-      <?= $stages !== '' ? $stages : empty_state('list-checks', '', (string) t('ui.stages_empty')) ?>
+      <?= $stages !== '' ? $stages : empty_state('list-checks', '', (string) t($isDone ? 'project.stages_empty_done' : 'ui.stages_empty')) ?>
     </section>
   </div>
 </div>

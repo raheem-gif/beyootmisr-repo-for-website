@@ -6,7 +6,7 @@
  * Plain functions (return '' / null for invalid input):
  *   adm_clean(string $s, bool $multiline = false): string   strip control chars, normalise newlines, trim
  *   adm_digits_latin(string $s): string                     ٠١٢٣ / ۰۱۲۳ → 0123
- *   adm_clean_url(string $s): string                        http(s) only; non-ASCII is percent-encoded; '' if invalid
+ *   adm_clean_url(string $s, bool $httpsOnly = false): string   http(s) (or https only); non-ASCII is percent-encoded; '' if invalid
  *   adm_clean_email(string $s): string
  *   adm_clean_phone(string $s): string                      digits, spaces, + - ( ); 6–15 digits
  *   adm_clean_slug(string $s, int $max = 60): string        a-z 0-9 - (ids used in URLs)
@@ -20,6 +20,7 @@
  *   $title = $in->text('title', 'العنوان', ['max' => 120, 'required' => true]);
  *   $body  = $in->text('body', 'النص', ['max' => 5000, 'multiline' => true]);
  *   $link  = $in->url('link', 'الرابط');            $mail = $in->email('email', 'البريد');
+ *   $pay   = $in->url('link', 'رابط التبرع', ['https_only' => true, 'https_error' => '…']);  // http:// refused
  *   $tel   = $in->phone('hotline', 'الخط الساخن');  $year = $in->year('year', 'السنة');
  *   $date  = $in->date('updated_at', 'التاريخ', ['month' => true]);
  *   $n     = $in->number('value', 'الرقم', ['min' => 0]);   // int|float|null
@@ -69,7 +70,7 @@ function adm_clean(string $s, bool $multiline = false): string
     return trim($s);
 }
 
-function adm_clean_url(string $s): string
+function adm_clean_url(string $s, bool $httpsOnly = false): string
 {
     $s = trim(adm_clean($s));
     if ($s === '') {
@@ -79,7 +80,7 @@ function adm_clean_url(string $s): string
     $s = (string) preg_replace_callback('/[^\x21-\x7E]/u', function ($m) {
         return rawurlencode($m[0]);
     }, $s);
-    if (!preg_match('#^https?://#i', $s) || filter_var($s, FILTER_VALIDATE_URL) === false) {
+    if (!preg_match($httpsOnly ? '#^https://#i' : '#^https?://#i', $s) || filter_var($s, FILTER_VALIDATE_URL) === false) {
         return '';
     }
     $host = (string) parse_url($s, PHP_URL_HOST);
@@ -241,6 +242,7 @@ final class AdmInput
         return $v;
     }
 
+    /** Options: required, https_only (refuse http:// links), https_error (message for an http:// link). */
     public function url(string $path, string $label, array $o = []): string
     {
         $raw = trim($this->raw($path));
@@ -253,6 +255,9 @@ final class AdmInput
         $v = adm_clean_url($raw);
         if ($v === '') {
             $this->error($path, '«' . $label . '»: اكتب رابطًا كاملًا يبدأ بـ https:// (مثل https://www.facebook.com/…).');
+        } elseif (!empty($o['https_only']) && adm_clean_url($v, true) === '') {
+            $this->error($path, '«' . $label . '»: ' . (string) ($o['https_error'] ?? 'يُقبل الرابط الآمن فقط، أي الذي يبدأ بـ https:// وليس http://.'));
+            return '';
         }
         return $v;
     }

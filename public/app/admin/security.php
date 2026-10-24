@@ -188,14 +188,18 @@ function adm_session_start(): void
     if (session_status() === PHP_SESSION_ACTIVE) {
         return;
     }
-    @ini_set('session.use_strict_mode', '1');
-    @ini_set('session.use_cookies', '1');
-    @ini_set('session.use_only_cookies', '1');
-    @ini_set('session.use_trans_sid', '0');
-    @ini_set('session.cookie_httponly', '1');
-    @ini_set('session.gc_maxlifetime', (string) ADM_ABSOLUTE_TIMEOUT);
-    @ini_set('session.gc_probability', '1');
-    @ini_set('session.gc_divisor', '50');
+    // Given to session_start() instead of ini_set(): this still works where the host disables
+    // ini_set() (since PHP 8 a disabled function is a fatal "undefined function", even with "@").
+    $options = [
+        'use_strict_mode' => '1',
+        'use_cookies' => '1',
+        'use_only_cookies' => '1',
+        'use_trans_sid' => '0',
+        'cookie_httponly' => '1',
+        'gc_maxlifetime' => (string) ADM_ABSOLUTE_TIMEOUT,
+        'gc_probability' => '1',
+        'gc_divisor' => '50',
+    ];
     session_cache_limiter('');
     session_name(ADM_SESSION_NAME);
 
@@ -218,7 +222,7 @@ function adm_session_start(): void
         'httponly' => true,
         'samesite' => 'Strict',
     ]);
-    if (!@session_start()) {
+    if (!@session_start($options)) {
         throw new RuntimeException('Could not start the admin session.');
     }
 }
@@ -321,16 +325,20 @@ function adm_origin_ok(): bool
         return false;
     }
     $sent = $host . ($port ? ':' . $port : '');
+    // Same host as this request, or the site address set in «الإعدادات» (for hosting behind a proxy
+    // that rewrites Host). X-Forwarded-Host is sent by the client, so it is never trusted here.
+    $candidates = [(string) ($_SERVER['HTTP_HOST'] ?? ''), (string) ($_SERVER['SERVER_NAME'] ?? '')];
+    try {
+        $candidates[] = (string) parse_url((string) (bm_settings()['site_url'] ?? ''), PHP_URL_HOST);
+    } catch (Throwable $e) {
+        // Unreadable settings: the request's own host is still accepted.
+    }
     $allowed = [];
-    foreach (['HTTP_HOST', 'HTTP_X_FORWARDED_HOST', 'SERVER_NAME'] as $k) {
-        if (!empty($_SERVER[$k])) {
-            foreach (explode(',', strtolower((string) $_SERVER[$k])) as $h) {
-                $h = trim($h);
-                if ($h !== '') {
-                    $allowed[] = $h;
-                    $allowed[] = preg_replace('/:(80|443)$/', '', $h);
-                }
-            }
+    foreach ($candidates as $h) {
+        $h = strtolower(trim($h));
+        if ($h !== '') {
+            $allowed[] = $h;
+            $allowed[] = preg_replace('/:(80|443)$/', '', $h);
         }
     }
     return in_array($sent, $allowed, true) || in_array($host, $allowed, true);

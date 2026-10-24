@@ -139,8 +139,12 @@ function adm_content_save(string $name, callable $mutate, string $action, $detai
         bm_json_write($file, $new);
         try {
             $report = adm_rebuild($action);
-        } catch (AdmUserError $e) {
-            // Put the previous content back and rebuild so the public site stays consistent.
+        } catch (Throwable $e) {
+            // Any failure (not only a build error): put the previous content back and rebuild
+            // so the public site stays consistent.
+            if (!($e instanceof AdmUserError)) {
+                adm_log_error($e);
+            }
             if ($raw === null || $legacy) {
                 @unlink($file);
             } else {
@@ -156,7 +160,7 @@ function adm_content_save(string $name, callable $mutate, string $action, $detai
             throw new AdmUserError(
                 'لم يُحفظ التعديل: تعذّر تحديث صفحات الموقع بالمحتوى الجديد، فأُعيد المحتوى السابق كما كان. '
                 . 'إن تكرر ذلك فأرسل «التفاصيل التقنية» إلى المطوّر.',
-                $e->details
+                $e instanceof AdmUserError ? $e->details : adm_error_details($e)
             );
         }
         if ($legacy) {
@@ -174,7 +178,9 @@ function adm_rebuild(string $reason = ''): array
 {
     $user = $GLOBALS['adm_user'] ?? null;
     $status = ['t' => time(), 'u' => $user !== null ? adm_user_label($user) : '', 'reason' => $reason];
-    @set_time_limit(120);
+    if (function_exists('set_time_limit')) { // may be disabled by the host (undefined on PHP 8)
+        @set_time_limit(120);
+    }
     try {
         bm_content_reset();
         $report = bm_build();
@@ -218,9 +224,9 @@ function adm_build_status(): array
 
 function adm_build_summary(array $report): string
 {
-    $msg = 'أُعيد بناء الموقع: ' . (int) $report['pages'] . ' صفحة';
+    $msg = 'أُعيد بناء الموقع: ' . adm_plural((int) $report['pages'], 'صفحة واحدة', 'صفحتان', 'صفحات', 'صفحة');
     $w = count($report['written'] ?? []);
-    $msg .= $w > 0 ? '، وتحدّث ' . $w . ' ملف.' : '، ولم تتغير أي صفحة منشورة.';
+    $msg .= $w > 0 ? '، وتحدّث ' . adm_plural($w, 'ملف واحد', 'ملفان', 'ملفات', 'ملفًا') . '.' : '، ولم تتغير أي صفحة منشورة.';
     return $msg;
 }
 

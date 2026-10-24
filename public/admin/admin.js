@@ -27,6 +27,17 @@
       .trim();
   }
 
+  /* Arabic count + noun, same rules as adm_plural() in app/admin/ui.php:
+     plural(n, 'حرف واحد', 'حرفان', 'أحرف', 'حرفًا') → «حرف واحد», «حرفان», «5 أحرف», «120 حرفًا», «100 حرف». */
+  function plural(n, one, two, few, many) {
+    if (n === 1) { return one; }
+    if (n === 2) { return two; }
+    var r = n % 100;
+    if (r >= 3 && r <= 10) { return n + ' ' + few; }
+    if (r >= 11) { return n + ' ' + many; }
+    return n + ' ' + many.replace(/(?:\u064B\u0627|\u0627\u064B)$/, '');
+  }
+
   ready(function () {
     var body = d.body;
 
@@ -240,7 +251,7 @@
       out.className = 'adm-counter';
       out.setAttribute('aria-hidden', 'true');
       c.parentNode.insertBefore(out, c.nextSibling);
-      var upd = function () { out.textContent = c.value.length + ' حرفًا'; };
+      var upd = function () { out.textContent = plural(c.value.length, 'حرف واحد', 'حرفان', 'أحرف', 'حرفًا'); };
       c.addEventListener('input', upd);
       upd();
     });
@@ -311,7 +322,8 @@
           var warn = d.createElement('p');
           warn.className = 'adm-error adm-newimgs__warn';
           warn.setAttribute('role', 'alert');
-          warn.textContent = 'اخترت ' + all.length + ' صور، والحد في المرة الواحدة ' + maxFiles + '. اختر عددًا أقل ثم أضف الباقي بعد الحفظ.';
+          warn.textContent = 'اخترت ' + plural(all.length, 'صورة واحدة', 'صورتين', 'صور', 'صورة') + '، والحد في المرة الواحدة '
+            + plural(maxFiles, 'صورة واحدة', 'صورتان', 'صور', 'صورة') + '. اختر عددًا أقل ثم أضف الباقي بعد الحفظ.';
           box.appendChild(warn);
         }
         files.forEach(function (file, i) {

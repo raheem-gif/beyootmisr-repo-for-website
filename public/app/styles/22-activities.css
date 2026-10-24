@@ -173,15 +173,6 @@
 
 /* ---------- The ten activities ---------- */
 .tpl-activities .acts-list .section-head { margin-block-end: clamp(1.5rem, 1rem + 1.5vw, 2.25rem); }
-.tpl-activities .acts-list .section-title::after {
-  content: "";
-  display: block;
-  inline-size: 56px;
-  block-size: 5px;
-  margin-block-start: 0.85rem;
-  border-radius: 5px;
-  background: var(--amber);
-}
 .tpl-activities .acts-grid { display: grid; gap: 1rem; }
 @media (min-width: 960px) {
   .tpl-activities .acts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
@@ -251,11 +242,8 @@
 .tpl-activities .act-card__subtitle { margin-block-start: 0.2rem; color: var(--blue-700); font-weight: 700; font-size: var(--fs-sm); }
 
 .tpl-activities .act-card__body { grid-area: body; display: flex; flex-direction: column; gap: 0.85rem; align-self: stretch; min-inline-size: 0; }
+/* Whole sentences only (chosen in activities.php), so no line clamp that would cut a qualifier mid-phrase. */
 .tpl-activities .act-card__excerpt {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
-  overflow: hidden;
   color: var(--ink-2);
   font-size: var(--fs-sm);
   line-height: 1.9;
@@ -287,7 +275,7 @@
   }
   .tpl-activities .act-card__door { inline-size: 84px; block-size: 104px; }
   .tpl-activities .act-card__door > .icon { inline-size: 38px; block-size: 38px; }
-  .tpl-activities .act-card__excerpt { display: block; overflow: visible; font-size: var(--fs-base); }
+  .tpl-activities .act-card__excerpt { font-size: var(--fs-base); }
 }
 
 /* ---------- «مبادراتنا الخاصة» ---------- */
@@ -377,15 +365,6 @@
 @media (min-width: 960px) {
   .tpl-activity .act-intro__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2.5rem, 1rem + 4vw, 4.5rem); }
 }
-.tpl-activity .act-about .section-title::after {
-  content: "";
-  display: block;
-  inline-size: 56px;
-  block-size: 5px;
-  margin-block-start: 0.85rem;
-  border-radius: 5px;
-  background: var(--amber);
-}
 .tpl-activity .act-about__text { margin-block-start: 1.35rem; color: var(--ink-2); font-size: var(--fs-md); line-height: 2; }
 @media (min-width: 960px) {
   .tpl-activity .act-about { padding-block-start: 0.5rem; }
@@ -423,6 +402,16 @@
   line-height: 1.7;
 }
 .tpl-activity .act-assist__list .icon { margin-block-start: 0; background: var(--amber-50); color: var(--amber-800); }
+.tpl-activity .act-assist__note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin-block-start: 0.95rem;
+  color: var(--slate);
+  font-size: var(--fs-sm);
+  line-height: 1.75;
+}
+.tpl-activity .act-assist__note .icon { flex: none; inline-size: 18px; block-size: 18px; margin-block-start: 0.2em; color: var(--blue-700); }
 
 /* ---------- Documentation band: projects, photos, verified numbers ---------- */
 .tpl-activity .act-docs__inner { display: grid; gap: clamp(2.75rem, 1.75rem + 3vw, 4.25rem); }
@@ -514,6 +503,7 @@
 .tpl-activity .act-contribute {
   position: relative;
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* phones: one track that can shrink below the buttons' width */
   gap: 1.25rem 1.75rem;
   align-items: center;
   padding: clamp(1.5rem, 1rem + 2.5vw, 3rem);
@@ -560,6 +550,9 @@
 .tpl-activity .act-contribute__note .icon { flex: none; margin-block-start: 0.2em; color: var(--amber-300); }
 .tpl-activity .act-contribute__actions { flex-direction: column; align-items: stretch; }
 .tpl-activity .act-contribute__actions .btn { inline-size: 100%; }
+@media (max-width: 719px) {
+  .tpl-activity .act-contribute__actions .btn { white-space: normal; }
+}
 .tpl-activity .act-call .num { display: none; font-weight: 800; letter-spacing: 0.03em; color: var(--amber-300); }
 @media (min-width: 560px) {
   .tpl-activity .act-call .num { display: inline; }

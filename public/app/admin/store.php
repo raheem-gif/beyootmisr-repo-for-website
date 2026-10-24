@@ -67,7 +67,9 @@ function adm_write_protected(string $file, string $contents): void
     if (@file_put_contents($tmp, $contents, LOCK_EX) === false) {
         throw new AdmUserError(adm_msg_unwritable($dir));
     }
-    @chmod($tmp, 0640);
+    if (function_exists('chmod')) { // hosts may disable it (a fatal error on PHP 8)
+        @chmod($tmp, 0640);
+    }
     if (!@rename($tmp, $file)) {
         @unlink($tmp);
         throw new AdmUserError(adm_msg_unwritable($dir));

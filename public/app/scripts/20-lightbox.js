@@ -4,23 +4,48 @@
   var galleries = document.querySelectorAll("[data-lightbox]");
   if (!galleries.length || typeof HTMLDialogElement !== "function") return;
 
-  var lang = document.documentElement;
-  var labels = {
-    close: lang.getAttribute("data-l-close") || "إغلاق",
-    prev: lang.getAttribute("data-l-prev") || "السابق",
-    next: lang.getAttribute("data-l-next") || "التالي"
+  // Labels are editable texts carried on <html data-l-*>. They are only ever set
+  // with setAttribute/textContent — never parsed as HTML.
+  var root = document.documentElement;
+  var label = function (name, fallback) {
+    return root.getAttribute("data-l-" + name) || fallback;
+  };
+  var counterText = label("image-of", "{n} / {total}");
+
+  var el = function (tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text) node.textContent = text;
+    return node;
+  };
+  var button = function (cls, name, glyph) {
+    var b = el("button", "lightbox__btn " + cls, glyph);
+    b.type = "button";
+    b.setAttribute("aria-label", name);
+    return b;
   };
 
-  var dlg = document.createElement("dialog");
-  dlg.className = "lightbox";
-  dlg.innerHTML =
-    '<div class="lightbox__inner"><figure><img alt=""><figcaption class="lightbox__caption"></figcaption></figure></div>' +
-    '<button class="lightbox__btn lightbox__close" type="button" aria-label="' + labels.close + '">✕</button>' +
-    '<button class="lightbox__btn lightbox__prev" type="button" aria-label="' + labels.prev + '">→</button>' +
-    '<button class="lightbox__btn lightbox__next" type="button" aria-label="' + labels.next + '">←</button>';
+  var dlg = el("dialog", "lightbox");
+  dlg.setAttribute("aria-label", label("gallery", "الصور"));
+  var inner = el("div", "lightbox__inner");
+  var fig = el("figure");
+  var img = el("img");
+  img.alt = "";
+  var cap = el("figcaption", "lightbox__caption");
+  var status = el("p", "sr-only");
+  status.setAttribute("aria-live", "polite");
+  var closeBtn = button("lightbox__close", label("close", "إغلاق"), "✕");
+  var prevBtn = button("lightbox__prev", label("prev", "السابق"), "→");
+  var nextBtn = button("lightbox__next", label("next", "التالي"), "←");
+  fig.appendChild(img);
+  fig.appendChild(cap);
+  inner.appendChild(fig);
+  dlg.appendChild(inner);
+  dlg.appendChild(status);
+  dlg.appendChild(closeBtn);
+  dlg.appendChild(prevBtn);
+  dlg.appendChild(nextBtn);
   document.body.appendChild(dlg);
-  var img = dlg.querySelector("img");
-  var cap = dlg.querySelector("figcaption");
   var items = [];
   var index = 0;
 
@@ -32,8 +57,12 @@
     img.alt = thumb ? thumb.alt : "";
     cap.textContent = a.getAttribute("data-caption") || "";
     var multi = items.length > 1;
-    dlg.querySelector(".lightbox__prev").hidden = !multi;
-    dlg.querySelector(".lightbox__next").hidden = !multi;
+    prevBtn.hidden = !multi;
+    nextBtn.hidden = !multi;
+    // Announce the position in the set ("صورة 2 من 6") and the caption.
+    status.textContent = multi
+      ? counterText.replace("{n}", String(index + 1)).replace("{total}", String(items.length)) + (cap.textContent ? "، " + cap.textContent : "")
+      : "";
   }
 
   Array.prototype.forEach.call(galleries, function (g) {
@@ -48,14 +77,17 @@
     });
   });
 
-  dlg.querySelector(".lightbox__close").addEventListener("click", function () { dlg.close(); });
+  closeBtn.addEventListener("click", function () { dlg.close(); });
   // RTL: "previous" sits on the right.
-  dlg.querySelector(".lightbox__prev").addEventListener("click", function () { show(index - 1); });
-  dlg.querySelector(".lightbox__next").addEventListener("click", function () { show(index + 1); });
+  prevBtn.addEventListener("click", function () { show(index - 1); });
+  nextBtn.addEventListener("click", function () { show(index + 1); });
   dlg.addEventListener("click", function (e) { if (e.target === dlg || e.target.classList.contains("lightbox__inner")) dlg.close(); });
   dlg.addEventListener("keydown", function (e) {
     if (e.key === "ArrowLeft") show(index + 1);
     if (e.key === "ArrowRight") show(index - 1);
   });
-  dlg.addEventListener("close", function () { img.removeAttribute("src"); });
+  dlg.addEventListener("close", function () {
+    img.removeAttribute("src");
+    status.textContent = "";
+  });
 })();

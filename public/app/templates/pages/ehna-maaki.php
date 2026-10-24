@@ -14,9 +14,10 @@ BM::$page['title'] = (string) t('ehna_maaki.meta_title');
 BM::$page['description'] = (string) t('ehna_maaki.meta_description');
 
 $contact = bm_settings()['contact'];
-$legalNum = trim((string) $contact['whatsapp_legal']);
-$hotline = trim((string) $contact['hotline']);
 $waLegal = wa_legal();
+/* A number counts only when it can be dialled, so no link ever gets an empty href. */
+$legalNum = $waLegal !== '' ? trim((string) $contact['whatsapp_legal']) : '';
+$hotline = tel_href((string) $contact['hotline']) !== '' ? trim((string) $contact['hotline']) : '';
 
 $waButton = function (string $size = 'lg') use ($waLegal): string {
     if ($waLegal === '') {
@@ -41,6 +42,35 @@ if ($legalNum !== '' && $hotline !== '') {
         ],
         $contactNote
     );
+}
+
+/*
+ * The two official lines, addressed to women («اتصلي», «تواصلي») like the rest of the
+ * page, the initiative's own WhatsApp first. Same markup and classes as the shared
+ * help_lines(), whose button labels are masculine.
+ */
+$waGeneral = $hotline !== '' ? wa_general() : '';
+$helpLines = '';
+if ($waLegal !== '' || $hotline !== '') {
+    $helpLines = '<div class="help-lines">';
+    if ($waLegal !== '') {
+        $helpLines .= '<div class="help-line help-line--legal">'
+            . '<p class="help-line__label">' . te('get_involved.help.legal_label') . '</p>'
+            . '<p class="help-line__num">' . phone_html($legalNum) . '</p>'
+            . '<div class="actions">' . btn(t('buttons.legal_whatsapp'), $waLegal, 'whatsapp', ['icon' => 'whatsapp', 'size' => 'sm']) . '</div>'
+            . '</div>';
+    }
+    if ($hotline !== '') {
+        $helpLines .= '<div class="help-line">'
+            . '<p class="help-line__label">' . te('get_involved.help.general_label') . '</p>'
+            . '<p class="help-line__num">' . phone_html($hotline) . '</p>'
+            . '<div class="actions">'
+            . btn(t('ehna_maaki.call_button'), tel_href($hotline), 'primary', ['icon' => 'phone', 'size' => 'sm'])
+            . ($waGeneral !== '' ? btn(t('ehna_maaki.whatsapp_button'), $waGeneral, 'whatsapp', ['icon' => 'whatsapp', 'size' => 'sm']) : '')
+            . '</div>'
+            . '</div>';
+    }
+    $helpLines .= '</div>';
 }
 
 /* Tagline: the reassurance ("إنتِ مش مطالبة تعرفي القانون..") then the promise, on two lines. */
@@ -99,6 +129,7 @@ $poster = '<div class="em-poster" aria-hidden="true">'
         'title' => t('ehna_maaki.topics_title'),
         'id' => 'topics-title',
         'text' => t('ehna_maaki.topics_text'),
+        'bar' => true,
     ]) ?>
     <div class="em-topics__card">
       <?= icon('scale', 'em-topics__mark') ?>
@@ -154,7 +185,7 @@ $poster = '<div class="em-poster" aria-hidden="true">'
         <p class="em-contact__note"><?= $contactNote ?></p>
         <?php endif; ?>
       </div>
-      <?= help_lines() ?>
+      <?= $helpLines ?>
     </div>
   </div>
 </section>

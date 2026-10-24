@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Admin panel tests: fresh sandbox copy of public/ → PHP 7.4 lint → unit tests → HTTP flow tests
-# (stage 1: auth, texts, settings, users, backups; stage 2: content sections).
+# (stage 1: auth, texts, settings, users, backups; stage 2: content sections; then the same server
+# restarted with the functions restrictive shared hosts disable).
 # Usage: tests/admin/run.sh [sandbox-dir] [port]
 # Never touches the real site: everything runs on a disposable copy.
 set -euo pipefail
@@ -13,7 +14,7 @@ rm -rf "$SANDBOX"
 mkdir -p "$SANDBOX"
 cp -r "$REPO/public" "$SITE"
 # Start from a clean runtime state (no users, logs, sessions, uploads).
-find "$SITE/app/storage" -mindepth 1 ! -name index.html ! -name build-manifest.json -exec rm -rf {} + 2>/dev/null || true
+find "$SITE/app/storage" -mindepth 1 ! -name index.html -exec rm -rf {} + 2>/dev/null || true
 find "$SITE/uploads/images" "$SITE/uploads/reports" -mindepth 1 ! -name index.html -delete 2>/dev/null || true
 
 echo "== PHP 7.4 compatibility"
@@ -24,15 +25,26 @@ echo "== Unit tests"
 php "$REPO/tests/admin/unit-test.php" "$SITE"
 php "$REPO/tests/admin/unit-content-test.php" "$SITE"
 
-echo "== HTTP tests (php -S 127.0.0.1:$PORT)"
-php -S "127.0.0.1:$PORT" -t "$SITE" > "$SANDBOX/server.log" 2>&1 &
-SERVER=$!
+SERVER=
 trap 'kill $SERVER 2>/dev/null || true' EXIT
-for _ in $(seq 1 50); do
-  if curl -s -o /dev/null "http://127.0.0.1:$PORT/robots.txt"; then break; fi
-  sleep 0.1
-done
+# start_server [php -d options…]: (re)start php -S on $PORT and wait until it answers.
+start_server() {
+  if [ -n "$SERVER" ]; then kill "$SERVER" 2>/dev/null || true; wait "$SERVER" 2>/dev/null || true; fi
+  php "$@" -S "127.0.0.1:$PORT" -t "$SITE" >> "$SANDBOX/server.log" 2>&1 &
+  SERVER=$!
+  for _ in $(seq 1 50); do
+    if curl -s -o /dev/null "http://127.0.0.1:$PORT/robots.txt"; then return 0; fi
+    sleep 0.1
+  done
+}
+
+echo "== HTTP tests (php -S 127.0.0.1:$PORT)"
+start_server
 php "$REPO/tests/admin/http-test.php" "http://127.0.0.1:$PORT" "$SITE"
 
 echo "== HTTP tests: content sections (stats, projects, stories, reports, galleries)"
 php "$REPO/tests/admin/http-content-test.php" "http://127.0.0.1:$PORT" "$SITE"
+
+echo "== HTTP tests: restrictive host (functions shared hosts often disable)"
+start_server -d disable_functions=set_time_limit,ignore_user_abort,ini_set,chmod,exec,shell_exec,system,passthru,proc_open,popen,putenv,symlink,php_uname
+php "$REPO/tests/admin/http-host-limits-test.php" "http://127.0.0.1:$PORT" "$SITE"

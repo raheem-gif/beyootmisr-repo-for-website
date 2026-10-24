@@ -78,6 +78,99 @@ function bm_bundle(string $srcDir, string $pattern, string $banner): string
     return $out;
 }
 
+/**
+ * Shrink a stylesheet without changing what it means: drop comments, collapse
+ * whitespace, and remove spaces around { } ; , — strings are never touched.
+ */
+function bm_minify_css(string $css): string
+{
+    $strings = [];
+    $css = (string) preg_replace_callback('#/\*.*?\*/|"(?:\\\\.|[^"\\\\])*"|\'(?:\\\\.|[^\'\\\\])*\'#s', function ($m) use (&$strings) {
+        if (strncmp($m[0], '/*', 2) === 0) {
+            return ' ';
+        }
+        $strings[] = $m[0];
+        return "\x01" . (count($strings) - 1) . "\x01";
+    }, $css);
+    $css = (string) preg_replace('/\s+/', ' ', $css);
+    $css = (string) preg_replace('/\s*([{};,])\s*/', '$1', $css);
+    $css = str_replace(';}', '}', $css);
+    $css = (string) preg_replace_callback('/\x01(\d+)\x01/', function ($m) use ($strings) {
+        return $strings[(int) $m[1]];
+    }, $css);
+    return trim($css);
+}
+
+/**
+ * CSS bundles. "core" (styles numbered below 10: tokens, base, components, header,
+ * footer) is shared by every page. Each page stylesheet (10-home.css, 20-about.css…)
+ * is its own small bundle, loaded only by the templates it styles: the template it is
+ * named after plus every template whose .tpl-<name> class it uses
+ * (20-about.css → about, charter). Pages therefore never download the CSS of the
+ * other templates.
+ * @return array<string,array{files:string[],templates:string[]}>
+ */
+function bm_css_bundles(): array
+{
+    static $cache = null;
+    if ($cache !== null) {
+        return $cache;
+    }
+    $files = glob(BM_APP_DIR . '/styles/*.css') ?: [];
+    sort($files, SORT_STRING);
+    $bundles = ['core' => ['files' => [], 'templates' => []]];
+    foreach ($files as $f) {
+        if (!preg_match('/^(\d+)-([a-z0-9-]+)\.css$/', basename($f), $m) || (int) $m[1] < 10) {
+            $bundles['core']['files'][] = $f;
+            continue;
+        }
+        preg_match_all('/\.tpl-([a-z0-9-]+)/', (string) file_get_contents($f), $t);
+        $name = $m[2];
+        $prev = $bundles[$name] ?? ['files' => [], 'templates' => []];
+        $bundles[$name] = [
+            'files' => array_merge($prev['files'], [$f]),
+            'templates' => array_values(array_unique(array_merge($prev['templates'], [$name], $t[1]))),
+        ];
+    }
+    return $cache = $bundles;
+}
+
+/** Stylesheets (paths under assets/) for a template: the core bundle, then its page bundles. */
+function bm_page_styles(string $tpl): array
+{
+    $out = ['css/core.css'];
+    foreach (bm_css_bundles() as $name => $b) {
+        if ($name !== 'core' && in_array($tpl, $b['templates'], true)) {
+            $out[] = 'css/' . $name . '.css';
+        }
+    }
+    return $out;
+}
+
+/** Write the CSS bundles; remove generated stylesheets that no longer exist (e.g. the old site.css). */
+function bm_write_css(array &$report): void
+{
+    $banner = '/* Beyoot Misr — generated from app/styles by the build. Do not edit here. */';
+    $keep = [];
+    foreach (bm_css_bundles() as $name => $b) {
+        $css = '';
+        foreach ($b['files'] as $f) {
+            $css .= (string) file_get_contents($f) . "\n";
+        }
+        $file = 'assets/css/' . $name . '.css';
+        $keep[$file] = true;
+        if (bm_write_if_changed(BM_PUBLIC . '/' . $file, $banner . "\n" . bm_minify_css($css) . "\n")) {
+            $report['written'][] = $file;
+        }
+    }
+    foreach (glob(BM_PUBLIC . '/assets/css/*.css') ?: [] as $old) {
+        $file = 'assets/css/' . basename($old);
+        if (!isset($keep[$file]) && @unlink($old)) {
+            $report['removed'][] = $file;
+        }
+    }
+}
+
 /** Write only when content changed (keeps mtimes and caches stable). */
 function bm_write_if_changed(string $file, string $contents): bool
 {
@@ -135,10 +228,7 @@ function bm_build(array $only = []): array
         $report = ['written' => [], 'removed' => [], 'warnings' => [], 'pages' => 0];
 
         // 1) Assets first, so page templates hash the fresh files.
-        $css = bm_bundle(BM_APP_DIR . '/styles', '*.css', '/* Beyoot Misr — generated from app/styles by the build. Do not edit here. */');
-        if (bm_write_if_changed(BM_PUBLIC . '/assets/css/site.css', $css)) {
-            $report['written'][] = 'assets/css/site.css';
-        }
+        bm_write_css($report);
         $js = bm_bundle(BM_APP_DIR . '/scripts', '*.js', '/* Beyoot Misr — generated from app/scripts by the build. Do not edit here. */');
         if (bm_write_if_changed(BM_PUBLIC . '/assets/js/site.js', $js)) {
             $report['written'][] = 'assets/js/site.js';
@@ -184,18 +274,27 @@ function bm_build(array $only = []): array
         }
 
         // 4) Remove pages of projects/stories that were deleted or unpublished.
-        $manifestFile = BM_STORAGE . '/build-manifest.json';
-        $previous = (array) bm_json_read($manifestFile, []);
-        foreach ($previous as $old) {
-            if (!is_string($old) || isset($rendered[$old])) {
-                continue;
-            }
-            if (preg_match('#^(projects|stories)/[a-z0-9-]+\.html$#', $old) && is_file(BM_PUBLIC . '/' . $old)) {
-                @unlink(BM_PUBLIC . '/' . $old);
-                $report['removed'][] = $old;
+        // projects/ and stories/ hold only generated pages, so every page there that
+        // was not rendered now is stale. Scanning the folders (instead of a list of
+        // previously built pages) also works on a fresh install and after a restore.
+        foreach (['projects', 'stories'] as $dir) {
+            foreach (glob(BM_PUBLIC . '/' . $dir . '/*.html') ?: [] as $file) {
+                $old = $dir . '/' . basename($file);
+                if (isset($rendered[$old]) || !preg_match('#^(projects|stories)/[a-z0-9-]+\.html$#', $old)) {
+                    continue;
+                }
+                if (@unlink($file)) {
+                    $report['removed'][] = $old;
+                } else {
+                    $report['warnings'][] = 'Could not remove stale page: ' . $old;
+                }
             }
         }
-        bm_json_write($manifestFile, array_keys($rendered));
+        // Older versions kept a plain-JSON list of built pages in storage; it is no
+        // longer needed and, unlike the guarded .php files, it was readable over HTTP.
+        if (is_file(BM_STORAGE . '/build-manifest.json')) {
+            @unlink(BM_STORAGE . '/build-manifest.json');
+        }
 
         foreach (array_keys(BM::$missingTexts) as $key) {
             $report['warnings'][] = 'Missing text key: ' . $key;

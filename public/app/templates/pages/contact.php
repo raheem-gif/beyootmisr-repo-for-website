@@ -5,7 +5,8 @@
  * settings.social), the WhatsApp message composer next to a short
  * explanation, «أسئلة شائعة», and «شاركنا الخير».
  *
- * A channel is shown only when its setting is filled in. Values that still
+ * A channel is shown only when its setting is filled in (a phone number only when it
+ * can be dialled), and «قنواتنا الرسمية» only when it has a channel. Values that still
  * hold a "[…]" placeholder from the content document (e.g. «يُدرج بعد اعتماده»)
  * are treated as empty and never reach the page.
  * Closures only — no named functions in templates.
@@ -29,9 +30,15 @@ $url = function ($v) use ($val): string {
     return preg_match('#^https?://[^\s<>"]+$#i', $v) ? $v : '';
 };
 
-$hotline = $val($c['hotline']);
-$waGeneral = $val($c['whatsapp_general']);
-$legal = $val($c['whatsapp_legal']);
+/* Phone numbers: only those that can be dialled, so no button ever gets an empty href. */
+$phone = function ($v) use ($val): string {
+    $v = $val($v);
+    return intl_phone($v) !== '' ? $v : '';
+};
+
+$hotline = $phone($c['hotline']);
+$waGeneral = $phone($c['whatsapp_general']);
+$legal = $phone($c['whatsapp_legal']);
 $address = $val($c['address']);
 $addressDetail = $val($c['address_detail']);
 $mapUrl = $url($c['map_url']);
@@ -139,6 +146,7 @@ echo page_hero([
 ]);
 ?>
 
+<?php if ($mainNumber !== '' || $legal !== '' || $cards): /* no channel set at all → no empty «قنواتنا الرسمية» section */ ?>
 <section class="section ct-channels" aria-labelledby="channels-title">
   <div class="container">
     <?= section_head(['title' => t('contact.channels_title'), 'id' => 'channels-title']) ?>
@@ -180,7 +188,9 @@ echo page_hero([
         </div>
         <?= $numberRow('ct-num-legal', $legal) ?>
         <div class="ct-line__actions">
+          <?php if ($waLegalHref !== ''): ?>
           <a class="btn btn--whatsapp btn--lg" href="<?= e($waLegalHref) ?>" target="_blank" rel="noopener"><?= icon('whatsapp') ?><span><?= te('buttons.legal_whatsapp') ?></span><span class="sr-only"> (<?= te('ui.opens_whatsapp') ?>)</span></a>
+          <?php endif; ?>
           <?= btn(t('contact.legal_more'), 'ehna-maaki.html', 'ghost', ['icon_end' => 'arrow-left', 'class' => 'ct-line__more']) ?>
         </div>
       </li>
@@ -203,6 +213,7 @@ echo page_hero([
     <?php endif; ?>
   </div>
 </section>
+<?php endif; ?>
 
 <?php if ($form !== ''): ?>
 <section class="section section--tint ct-compose" aria-labelledby="compose-title">

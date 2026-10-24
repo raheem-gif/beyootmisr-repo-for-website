@@ -9,7 +9,8 @@
  *
  * Content document §08/§12: «لا يوصف المشروع بأنه اكتمل إلا بعد إثبات الإنجاز الفعلي» →
  * changing the status to «منجز» requires the «تم إثبات الإنجاز الفعلي للمشروع» checkbox
- * (checked here, on the server). Cost and donations appear only with show_financials.
+ * (checked here, on the server). §12 «كل مشروع له حالة وتاريخ آخر تحديث» → publishing
+ * requires «تاريخ آخر تحديث» (updated_at). Cost and donations appear only with show_financials.
  * Deleting a project, a stage or an image also deletes its files (when nothing else uses them).
  */
 defined('BM_APP') || exit;
@@ -133,7 +134,7 @@ if ($action === 'delete' && $record !== null) {
             adm_redirect('projects', ['id' => $id]);
         }
         $n = adm_delete_unreferenced($paths);
-        adm_flash('success', 'حُذف المشروع «' . $p['title'] . '»' . ($n > 0 ? ' وحُذفت صوره (' . $n . ' ملف)' : '') . '. ' . adm_build_summary($result['report']));
+        adm_flash('success', 'حُذف المشروع «' . $p['title'] . '»' . ($n > 0 ? ' وحُذفت صوره (' . adm_plural($n, 'ملف واحد', 'ملفان', 'ملفات', 'ملفًا') . ')' : '') . '. ' . adm_build_summary($result['report']));
         adm_redirect('projects');
     } catch (AdmUserError $e) {
         adm_flash('error', $e->getMessage(), $e->details);
@@ -166,6 +167,10 @@ if ($action === 'save' && $sIdx === -2 && ($id === 'new' || $record !== null)) {
     ];
     if ($fields['updated_at'] !== '' && $fields['updated_at'] > date('Y-m-d')) {
         $in->error('updated_at', '«تاريخ آخر تحديث» لا يمكن أن يكون في المستقبل.');
+    }
+    // §12: «كل مشروع له حالة وتاريخ آخر تحديث» — a published project always shows its update date.
+    if ($fields['published'] && $fields['updated_at'] === '' && trim($in->raw('updated_at')) === '') {
+        $in->error('updated_at', 'لا يُنشر المشروع دون «تاريخ آخر تحديث»: اكتب تاريخ آخر تحديث لبيانات المشروع أو صوره، أو ألغِ اختيار «نشر المشروع على الموقع» واحفظه مسودة.');
     }
     $wasDone = !$isNew && $p['status'] === 'done';
     if ($fields['status'] === 'done' && !$wasDone && !$in->bool('done_confirmed')) {
@@ -554,7 +559,7 @@ echo adm_card('بيانات المشروع', ''
 echo adm_card('الحالة والنشر', $statusHtml
     . '<div class="adm-cols">'
     . adm_field(['path' => 'updated_at', 'label' => 'تاريخ آخر تحديث', 'type' => 'date', 'value' => $s($val('updated_at') !== '' ? $val('updated_at') : ($isNew && !$fv ? date('Y-m-d') : '')),
-        'hint' => 'يظهر للزوار بجوار حالة المشروع.'])
+        'hint' => 'يظهر للزوار بجوار حالة المشروع، وهو مطلوب لنشر المشروع.'])
     . '</div>'
     . adm_field(['type' => 'checkbox', 'path' => 'published', 'label' => 'نشر المشروع على الموقع', 'value' => !empty($val('published')),
         'hint' => 'غير المنشور يبقى هنا فقط (مسودة) ولا تُنشأ له صفحة.']),

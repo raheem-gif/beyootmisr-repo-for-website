@@ -34,7 +34,7 @@
   - عنوان الموقع (النطاق) غير مُدخل.
   - جهة الإشهار، وصفة النفع العام، وتصريح جمع التبرعات غير مُدخلة.
   - التبرع عبر الموقع غير مفعّل.
-  - البريد الإلكتروني، وصفحات التواصل الرسمية، والعنوان التفصيلي، ومواعيد العمل غير مُدخلة.
+  - البريد الإلكتروني، وصفحات التواصل الرسمية، والعنوان التفصيلي، وساعات استقبال الرسائل غير مُدخلة.
 
   أما البنود اليدوية (مطابقة رقم الإشهار، واعتماد الصور، ومراجعة سياسة الخصوصية مع المختص القانوني، وتدقيق الأنشطة) فتراجعها إدارة المؤسسة.
 - **تنبيهات الاستضافة** (للمدير فقط): تظهر إذا كان مجلد غير قابل للكتابة أو إضافة PHP ناقصة.
@@ -56,6 +56,7 @@
 - إن عدّل زميل القسم نفسه أثناء عملك، تظهر رسالة «عدّل مستخدم آخر هذا القسم» وتبقى تعديلاتك في الحقول؛ راجعها واضغط «حفظ» مرة أخرى.
 - إن تعذّر تحديث الموقع بعد الحفظ، **يُعاد المحتوى السابق تلقائيًا** ولا يتأثر الموقع، وتبقى تعديلاتك ظاهرة لتعيد المحاولة أو ترسل «التفاصيل التقنية» إلى المطوّر.
 - إذا حاولت مغادرة الصفحة وفيها تعديلات غير محفوظة، يسألك المتصفح أولًا.
+- **بعد تحديث الكود** (رفع ملف التحديث من المطوّر) قد تظهر حقول جديدة لنصوص أضافها التحديث، أو قسم جديد كامل. تظهر هذه الحقول هنا فورًا بنصها الافتراضي من وثيقة المحتوى، كما تظهر على الموقع، ويمكنك تعديلها مثل أي نص آخر. لا تُنسخ إلى ملف النصوص إلا عند حفظ قسمها بعد تعديل فيه، أما نصوصك التي عدّلتها من قبل فلا يغيّرها التحديث أبدًا.
 
 ## 5. أثرنا بالأرقام
 
@@ -72,12 +73,14 @@
 
 قائمة المشروعات (الجارية أولًا ثم الأحدث تحديثًا) مع شارات: الحالة (جارٍ/منجز)، والنشر (منشور/غير منشور)، وتاريخ آخر تحديث (وشارة «بلا تاريخ تحديث» إن لم يُدخل). يمكن تصفية القائمة: الكل، جارٍ، منجز، غير منشورة.
 
+**المشروع المثال «مسجد سيدنا عيسى ابن مريم — الطور، جنوب سيناء»** (من وثيقة المحتوى، القسم 08: «مثال على مشروع قابل للعرض بعد التوثيق») يصل مع الموقع **مسودةً غير منشورة** وبلا تاريخ تحديث. انشره بعد إدخال تاريخ آخر تحديث وإضافة صور التنفيذ المعتمدة ومراحل التنفيذ (تاريخ وعنوان ووصف لكل مرحلة)؛ وحتى ذلك الحين تعرض صفحات الموقع أن المشروعات الموثقة تُعرض فور اعتمادها.
+
 **إضافة مشروع أو تعديله** (زر «إضافة مشروع» أو «تعديل»):
 
 1. **بيانات المشروع**: الاسم (مطلوب)، والنشاط التابع له (مطلوب)، والموقع العام (المدينة أو المحافظة فقط، دون عنوان تفصيلي)، والهدف، و**الرابط بالإنجليزية** (اختياري: حروف إنجليزية صغيرة وأرقام وشرطة، مثل `masjid-el-tor`؛ إن تُرك فارغًا يُنشأ تلقائيًا. تغييره لاحقًا يغيّر عنوان صفحة المشروع).
 2. **الحالة والنشر**:
    - «جارٍ» أو «منجز». **لا يوصف المشروع بأنه منجز إلا بعد إثبات الإنجاز الفعلي**: عند تغيير الحالة إلى «منجز» يجب وضع علامة على «تم إثبات الإنجاز الفعلي للمشروع»، وإلا يرفض النظام الحفظ.
-   - **تاريخ آخر تحديث** يظهر للزوار (لا يكون في المستقبل).
+   - **تاريخ آخر تحديث** يظهر للزوار (لا يكون في المستقبل)، وهو **مطلوب لنشر المشروع**: «كل مشروع له حالة وتاريخ آخر تحديث» (وثيقة المحتوى، القسم 12). إن وضعت علامة على «نشر المشروع» دون تاريخ يرفض النظام الحفظ وتبقى البيانات التي كتبتها في النموذج؛ أدخل التاريخ أو احفظ المشروع مسودة.
    - **نشر المشروع على الموقع**: غير المنشور يبقى في لوحة الإدارة فقط (مسودة) ولا تُنشأ له صفحة. عند إلغاء النشر تختفي صفحته من الموقع، وتعود عند إعادة النشر.
 3. **عن المشروع**: ملخص قصير يظهر في البطاقة وأعلى الصفحة، ووصف تفصيلي (سطر فارغ بين الفقرات).
 4. **التكلفة والتبرعات**: تُكتب بالجنيه (أرقام فقط)، ولا تظهر على الموقع إلا بوضع علامة على «إظهار التكلفة والتبرعات» بعد اعتماد بياناتها.
@@ -129,11 +132,13 @@
 
 - **عنوان الموقع (النطاق)**: الرابط الكامل بعد ربط النطاق، مثل `https://www.example.org`. يفعّل خريطة الموقع لمحركات البحث.
 - **الشعار**: صورة PNG بخلفية شفافة يُفضّل (أو JPG/WebP). ملفات SVG غير مقبولة لأسباب أمنية. يمكن إزالة الشعار المرفوع للعودة إلى الشعار المرسوم.
-- **التواصل**: الخط الساخن (مطلوب)، وواتساب المؤسسة، وواتساب «إحنا معاكي»، والبريد، والعنوان، ومواعيد العمل، ورابط الخريطة. الأرقام العربية (٠١٢…) تُحوَّل تلقائيًا.
+- **التواصل**: الخط الساخن (مطلوب)، وواتساب المؤسسة، وواتساب «إحنا معاكي»، والبريد، والعنوان، وساعات استقبال الرسائل، ورابط الخريطة. الأرقام العربية (٠١٢…) تُحوَّل تلقائيًا.
 - **الصفحات الرسمية**: روابط كاملة تبدأ بـ `https://`.
 - **الهوية القانونية**: لا تُكتب صفة النفع العام وتصاريح جمع التبرعات إلا بعد إثباتها وبالنص المطابق للمستندات المعتمدة (أرقامها ونطاقها وتواريخ صلاحيتها).
 - **التبرعات**:
   - لا تُنشر أي وسيلة تبرع إلا بعد التأكد من ملكية الحساب البنكي أو المحفظة باسم المؤسسة ومن تصريح جمع التبرعات. استخدم روابط التبرع الرسمية فقط.
+  - **رابط التبرع يجب أن يكون آمنًا ويبدأ بـ `https://`**؛ الموقع لا يعرض غير ذلك، لذا يرفض النموذج أي رابط يبدأ بـ `http://` برسالة واضحة ويبقي ما كتبته لتصححه. انسخ الرابط الرسمي الآمن من صفحة البنك أو الجهة المصدرة.
+  - لكل وسيلة اسم، ومعه بياناتها (رقم الحساب أو المحفظة…) أو رابطها الرسمي أو كلاهما. تظهر الوسائل وأزرار «ساهم» في كل الصفحات معًا (شارك في الخير، والأنشطة، والمشروعات) فقط عند تفعيل «إظهار وسائل التبرع» ووجود وسيلة واحدة صالحة على الأقل.
   - عند تفعيل «إظهار وسائل التبرع» أو تغيير الوسائل يجب وضع علامة على إقرار التحقق قبل الحفظ.
   - عند الإيقاف تعرض صفحة «شارك في الخير» أن وسائل التبرع تُعلن فور اعتمادها.
 
@@ -175,6 +180,8 @@
 | «لم تُرفع الصور التي اخترتها بعد…» | صحّح الأخطاء المذكورة ثم اختر الصور مرة أخرى واضغط «حفظ». |
 | «تعذّر رفع بعض الصور: …» | حُفظت بقية الصور. الصورة المذكورة ليست JPG/PNG/WebP أو أكبر من الحد؛ احفظها بصيغة JPG وأعد رفعها. |
 | «لا يوصف المشروع بأنه منجز…» | ضع علامة على «تم إثبات الإنجاز الفعلي للمشروع» بعد التأكد، أو أبقِ الحالة «جارٍ». |
+| «لا يُنشر المشروع دون «تاريخ آخر تحديث»…» | أدخل تاريخ آخر تحديث للمشروع، أو ألغِ اختيار «نشر المشروع على الموقع» واحفظه مسودة. ما كتبته باقٍ في النموذج. |
+| «رابط التبرع (…): يُقبل رابط التبرع الآمن فقط…» | استبدل الرابط برابط يبدأ بـ `https://` من الجهة الرسمية، ثم احفظ. |
 | «قبل نشر الحكاية أكّد مراجعة الخصوصية…» / «أكّد أن الأرقام … موثقة» / «أكّد أن إدارة المؤسسة راجعت التقرير…» | راجع المحتوى ثم ضع علامة على مربع التأكيد واحفظ. |
 
 ---
@@ -185,6 +192,7 @@
 
 * **PHP 7.4 or newer** (8.x fine). No database, no Composer, no external libraries.
 * Extensions: `session`, `json` (always on); **`gd`** with JPEG/PNG (WebP optional) for image uploads; **`fileinfo`** for upload type checks; `exif` (optional — auto-rotates phone photos); `zip` (optional — ZIP backup download); `mbstring` (optional).
+* Works when the host disables `set_time_limit`, `ini_set`, `ignore_user_abort` or `chmod` (`disable_functions`): since PHP 8 a disabled function is a fatal "undefined function" even with `@`, so every such call is guarded with `function_exists()` and the session options are passed to `session_start()`.
 * Recommended php.ini values (Turbify → PHP settings, or a `.user.ini`): `upload_max_filesize = 16M`, `post_max_size = 20M`, `memory_limit = 256M`, `max_execution_time = 60`. The panel shows the effective upload limit under every upload field.
 * HTTPS (the session cookie gets `Secure` and HSTS is sent when the request is HTTPS). The login page warns when it is opened over plain HTTP.
 
@@ -217,11 +225,11 @@ Turbify may ignore `.htaccess`, so nothing sensitive relies on it:
 * **Accounts** — `app/storage/users.php`, a PHP file that `return`s an array (written with `var_export`, atomic rename, `opcache_invalidate`). Requested over HTTP it prints nothing. Passwords: `password_hash` (bcrypt), min length 10; unknown users are verified against a dummy hash (no timing oracle).
 * **Other private data** (audit log, rate-limit counters, build status, error log, sessions, content backups) — `.php` files that start with `<?php exit; ?>` followed by JSON/JSON-lines or serialized session data. Temporary files are `.php` too.
 * **Sessions** — custom handler storing `app/storage/sessions/<sha256(id)>.php`; session name `bm_admin`; `use_strict_mode`; cookie `HttpOnly`, `SameSite=Strict`, `Secure` on HTTPS, path limited to the admin folder; id regenerated at login; idle timeout 30 min, absolute timeout 8 h; changing/resetting a password or deleting a user ends their other sessions.
-* **CSRF** — per-session token on every POST (`hash_equals`), plus an Origin/Referer same-host check; logout is POST-only.
+* **CSRF** — per-session token on every POST (`hash_equals`), plus an Origin/Referer check: the host must be the request's `Host`/`SERVER_NAME` or the host of `settings.site_url` (for a proxy that rewrites `Host`); `X-Forwarded-Host` is client-controlled and never trusted. Logout is POST-only.
 * **Login rate limiting** — 5 failures per IP-hash or per username within 15 min → 15-min lock, one generic message. Only HMACs of IPs/usernames are stored.
 * **Roles** — `admin` / `editor`, enforced server-side for every section and action (`adm_can()`).
 * **Headers on every admin response** — `Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'none'`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: same-origin`, `Cache-Control: no-store`, `X-Robots-Tag: noindex, nofollow` (+ `<meta name="robots" content="noindex,nofollow">`). No inline JS/CSS anywhere (all behaviour in `admin/admin.js`, all styles in `admin/admin.css`).
-* **Input** — every value is cleaned (valid UTF-8, no control characters, length limits), enums/slugs are whitelisted, URLs must be `http(s)`, emails use `filter_var`, the texts editor rejects unknown keys and preserves `_label` metadata. All output is escaped with `e()`.
+* **Input** — every value is cleaned (valid UTF-8, no control characters, length limits), enums/slugs are whitelisted, URLs must be `http(s)` (donation links `https://` only — `AdmInput::url(…, ['https_only' => true])` — because `bm_donation_methods()` shows nothing else), emails use `filter_var`, the texts editor rejects unknown keys and preserves `_label` metadata. The texts editor merges `app/lib/texts-defaults.json.php` (shipped by `tools/package.sh` in code updates) into the form and the structure check with `bm_merge_texts()`, like `bm_content('texts')`, so keys added by an update are editable at once; they are written to `texts.json` when their group is saved with an edit. All output is escaped with `e()`.
 * **Uploads** — JPEG/PNG/WebP only, ≤10 MB, ≤40 MP, verified with `getimagesize` + `finfo`, then **re-encoded with GD** (EXIF orientation applied, max 1600 px wide + 640 px thumbnail, JPEG q82) which strips EXIF/GPS. Logos keep transparency as PNG. PDFs: `finfo` + `%PDF-` magic, ≤15 MB. SVG is never accepted. Client file names are ignored (random hex names). Deletions are limited to `uploads/images|reports` with a `realpath` prefix check.
 
 ## Where data lives
@@ -243,13 +251,14 @@ Turbify may ignore `.htaccess`, so nothing sensitive relies on it:
 
 ## Save flow
 
-`validate → lock → re-read file → backup → bm_json_write() → bm_build()`. If `bm_build()` throws, the previous file is restored, the site is rebuilt, the editor sees an Arabic message (+ technical details) and keeps the typed values. The last build result is shown on the dashboard. Every successful change is written to the audit log.
+`validate → lock → re-read file → backup → bm_json_write() → bm_build()`. If the rebuild fails (any exception or PHP `Error`, not only a build error), the previous file is restored, the site is rebuilt, the editor sees an Arabic message (+ technical details) and keeps the typed values. The last build result is shown on the dashboard. Every successful change is written to the audit log.
 
 ## Tests
 
 ```bash
 tests/admin/run.sh <scratch-dir> [port]   # fresh sandbox copy of public/ → PHP 7.4 lint → unit tests → HTTP tests
-                                          #   unit-test.php, unit-content-test.php, http-test.php (stage 1), http-content-test.php (stage 2)
+                                          #   unit-test.php, unit-content-test.php, http-test.php (stage 1), http-content-test.php (stage 2),
+                                          #   then http-host-limits-test.php on php -S restarted with disable_functions=set_time_limit,ini_set,…
 php tests/admin/php74-lint.php            # PHP 8-only syntax/functions check for public/admin + public/app/admin
 node tests/admin/shots.js <node_modules> http://127.0.0.1:<port> <out-dir> <user> <password> 390,1280   # screenshots
 php tests/admin/make-fixtures.php <dir>  # drawn photo + PDF fixtures for the next command
@@ -257,7 +266,7 @@ node tests/admin/shots-content.js <node_modules> http://127.0.0.1:<port> <out-di
                                           # drives the content sections through the real UI (uploads, reorder…) on a SANDBOX
 ```
 
-`http-content-test.php` creates its own accounts in the sandbox and covers, among others: GPS EXIF removed from uploaded JPEGs, «منجز» refused without the completion confirmation, editor blocked from settings/users, published project/story pages appearing in the build and disappearing after unpublishing, files deleted with their records, stale-form conflicts, and rollback of a failed build (including the photos uploaded with it).
+`http-test.php` also covers texts keys that exist only in `texts-defaults.json.php` (listed, accepted, saved) and `http://` donation links being refused. `http-content-test.php` creates its own accounts in the sandbox and covers, among others: GPS EXIF removed from uploaded JPEGs, «منجز» refused without the completion confirmation, publishing refused without «تاريخ آخر تحديث» (typed values kept), editor blocked from settings/users, published project/story pages appearing in the build and disappearing after unpublishing, files deleted with their records, stale-form conflicts, and rollback of a failed build (including the photos uploaded with it).
 
 The tests never touch the real `public/` folder (they refuse to run against it). Note that `__DIR__` resolves symlinks, so sandboxes must be **copies**, not symlinks.
 
@@ -268,7 +277,7 @@ One file per section in `app/admin/sections/` (`stats.php`, `projects.php`, `sto
 | Section | Routes | File | Rules enforced on the server |
 |---|---|---|---|
 | أثرنا بالأرقام | `?p=stats` | `stats.json` | value = number ≥ 0 or empty (`null`); review date valid and not in the future; icon from `adm_stat_icons()`; activity from the registry; publishing new/changed visible numbers needs `verified`. Unknown keys of a card are kept. |
-| المشروعات | `?p=projects` (`f=ongoing\|done\|draft`), `&id=new\|<id>`, `&id=<id>&stage=new\|<n>` | `projects.json` | title + activity required; slug `[a-z0-9-]`, 2–60, unique; status `ongoing\|done`; **switching to `done` needs `done_confirmed`**; dates not in the future; `show_financials` needs a cost or donations value; Arabic digits normalised. Stages: date + title required, stored newest first; optional bump of `updated_at`. |
+| المشروعات | `?p=projects` (`f=ongoing\|done\|draft`), `&id=new\|<id>`, `&id=<id>&stage=new\|<n>` | `projects.json` | title + activity required; slug `[a-z0-9-]`, 2–60, unique; status `ongoing\|done`; **switching to `done` needs `done_confirmed`**; **publishing needs `updated_at`** (§12 «كل مشروع له حالة وتاريخ آخر تحديث»; the example project ships as an undated draft); dates not in the future; `show_financials` needs a cost or donations value; Arabic digits normalised. Stages: date + title required, stored newest first; optional bump of `updated_at`. |
 | الحكايات | `?p=stories` (`f=published\|draft`), `&id=new\|<id>` | `stories.json` | type from `bm_story_types()`; title + summary required; slug unique; **publishing, or any change to a published story, needs `privacy_confirmed`**. The type's guide (`texts.json` → `stories.types.<type>.guide`) is shown next to the selector. |
 | التقارير | `?p=reports`, `&id=new\|<id>` | `reports.json` | PDF required for a new report (`adm_pdf_upload`); year 19xx/20xx, not in the future; **publishing, or a new file for a published report, needs `review_confirmed`**; id = 10 random hex chars. |
 | معرض صور الأنشطة | `?p=galleries`, `&a=<activity>` | `galleries.json` | activity slug whitelisted; the file stays a JSON object (`{}` when empty). |
@@ -279,7 +288,7 @@ Common behaviour:
 * **Edit conflicts**: every edit form carries `rev` = `adm_rev(<stored record>)` (16-hex hash). If the record changed meanwhile, nothing is saved, a warning is shown and the typed values stay in the form. Deletes and stage actions check `rev` too.
 * **Images** (`adm_images_editor()` / `adm_images_from_post()` / `adm_images_pending()` / `adm_images_process()`): current images are posted as `imgs[n][k|alt|caption|del]` where `k = substr(sha1(src), 0, 12)`; only keys of the record being edited are accepted, so a form can never reference or delete another record's file. The posted row order is the saved order (admin.js moves rows client-side; without JS, «تقديم/تأخير» are submit buttons `imgs_move=<key>:up|down`). New files come from `imgs_new[]` with a required **Arabic** description per file (`imgs_alt_each[i]`, created by admin.js) or the shared `imgs_alt`. Descriptions are validated before any file is processed; files that are not images then fail individually (the others are saved and a warning lists the rejected ones). Images go through stage 1's `adm_image_upload()` (re-encoded, EXIF/GPS stripped). An invisible first submit button (`adm_enter_submit()`) keeps Enter from triggering a reorder button.
 * **Deleting files**: after a successful save, removed images/PDFs are deleted with `adm_delete_unreferenced()`, which first collects every `uploads/…` path still referenced by any content JSON (`adm_uploads_referenced()`) and only deletes files nobody uses (and only inside `uploads/images|reports`, via `adm_delete_upload()`). Consequence: **restoring an older JSON backup does not bring deleted photos back** — use the ZIP backup for that.
-* **Pages**: published projects/stories get `projects/<id>.html` / `stories/<id>.html`; unpublishing, renaming or deleting removes the old page on the next build (build manifest).
+* **Pages**: published projects/stories get `projects/<id>.html` / `stories/<id>.html`; unpublishing, renaming or deleting removes the old page on the next build (the build deletes every page in `projects/` and `stories/` it did not render).
 * **Dates** use the site timezone (Africa/Cairo, `app/bootstrap.php`) for "today".
 * **Audit actions**: `stats.save`, `projects.create|save|delete|stage|stage_delete`, `stories.create|save|delete`, `reports.create|save|delete`, `galleries.upload|save|delete`; details name the record and what changed (e.g. «الحالة ← منجز (أُكّد إثبات الإنجاز الفعلي)»).
 

@@ -63,12 +63,21 @@ $sec = function (string $key) use ($current): string {
         <li class="nav-item<?= $sec('contact') ?>"><a class="nav-link" href="<?= e(u('contact.html')) ?>"<?= $cur('contact.html') ?>><?= te('nav.contact') ?></a></li>
       </ul>
 
+      <?php
+      // Drawer contact buttons only for numbers that can be dialled (never an empty href).
+      $hotlineDrawer = (string) bm_settings()['contact']['hotline'];
+      $telDrawer = tel_href($hotlineDrawer);
+      $waDrawer = wa_general();
+      if ($telDrawer !== '' || $waDrawer !== ''): ?>
       <div class="nav-drawer-extra">
-        <?php $c = bm_settings()['contact']; if ($c['hotline'] !== ''): ?>
-        <a class="drawer-contact" href="<?= e(tel_href($c['hotline'])) ?>"><?= icon('phone') ?><span><?= te('buttons.call_hotline') ?></span><?= phone_html($c['hotline']) ?></a>
+        <?php if ($telDrawer !== ''): ?>
+        <a class="drawer-contact" href="<?= e($telDrawer) ?>"><?= icon('phone') ?><span><?= te('buttons.call_hotline') ?></span><?= phone_html($hotlineDrawer) ?></a>
         <?php endif; ?>
-        <a class="drawer-contact drawer-contact--wa" href="<?= e(wa_general()) ?>" target="_blank" rel="noopener"><?= icon('whatsapp') ?><span><?= te('buttons.whatsapp') ?></span></a>
+        <?php if ($waDrawer !== ''): ?>
+        <a class="drawer-contact drawer-contact--wa" href="<?= e($waDrawer) ?>" target="_blank" rel="noopener"><?= icon('whatsapp') ?><span><?= te('buttons.whatsapp') ?></span></a>
+        <?php endif; ?>
       </div>
+      <?php endif; ?>
     </nav>
 
     <div class="header-actions">

@@ -336,7 +336,7 @@ function adm_images_editor(array $o): string
         $html .= adm_alert('وصلت إلى الحد الأقصى (' . $max . ' صورة). احذف صورة لإضافة أخرى.', 'info');
     } else {
         $perRequest = min($room, adm_max_file_uploads());
-        $hint = trim((string) ($o['hint'] ?? '') . ' ' . adm_upload_limits_text('image') . ' يمكنك اختيار حتى ' . $perRequest . ' صور في المرة الواحدة.');
+        $hint = trim((string) ($o['hint'] ?? '') . ' ' . adm_upload_limits_text('image') . ' يمكنك اختيار حتى ' . adm_plural($perRequest, 'صورة واحدة', 'صورتين', 'صور', 'صورة') . ' في المرة الواحدة.');
         $html .= adm_field([
             'type' => 'file',
             'path' => $fileName,
@@ -460,7 +460,8 @@ function adm_images_pending(AdmInput $in, string $prefix, int $room): array
     }
     if (count($files) > $room) {
         $in->error($prefix . '_new', $room > 0
-            ? 'اخترت ' . count($files) . ' صور، ويمكن إضافة ' . $room . ' فقط قبل الوصول إلى الحد الأقصى.'
+            ? 'اخترت ' . adm_plural(count($files), 'صورة واحدة', 'صورتين', 'صور', 'صورة') . '، ويمكن إضافة '
+                . adm_plural($room, 'صورة واحدة', 'صورتين', 'صور', 'صورة') . ' فقط قبل الوصول إلى الحد الأقصى.'
             : 'وصلت إلى الحد الأقصى لعدد الصور. احذف صورة لإضافة أخرى.');
         return [];
     }

@@ -28,7 +28,11 @@ foreach (array_values($activities) as $i => $a) {
 }
 $doors .= '</ul><span class="acts-doors__ground" aria-hidden="true"></span></nav>';
 
-/* Rich activity card: door with its house number, name, subtitle, excerpt, tagline, link. */
+/*
+ * Rich activity card: door with its house number, name, subtitle, excerpt, tagline, link.
+ * The excerpt is made of whole sentences (sentence_excerpt()), so no card stops mid-clause
+ * or drops a qualifier such as «وفق دراسة الاحتياج والإمكانيات المتاحة».
+ */
 $card = function (array $a): string {
     return '<article class="act-card" id="act-' . e($a['slug']) . '">'
         . '<span class="act-card__door" aria-hidden="true">' . icon($a['icon'])
@@ -38,7 +42,7 @@ $card = function (array $a): string {
         . '<p class="act-card__subtitle">' . e($a['subtitle']) . '</p>'
         . '</div>'
         . '<div class="act-card__body">'
-        . '<p class="act-card__excerpt">' . e(excerpt((string) $a['description'], 190)) . '</p>'
+        . '<p class="act-card__excerpt">' . e(sentence_excerpt((string) $a['description'], 240)) . '</p>'
         . tagline((string) $a['tagline'], 'act-card__tagline')
         . '<span class="act-card__more" aria-hidden="true">' . te('ui.read_more') . icon('arrow-left') . '</span>'
         . '</div>'
@@ -56,7 +60,7 @@ $card = function (array $a): string {
 
 <section class="section section--tint acts-list" aria-labelledby="list-title">
   <div class="container">
-    <?= section_head(['title' => t('activities.list_title'), 'id' => 'list-title']) ?>
+    <?= section_head(['title' => t('activities.list_title'), 'id' => 'list-title', 'bar' => true]) ?>
     <ul class="acts-grid" role="list">
       <?php foreach ($activities as $a): ?>
       <li><?= $card($a) ?></li>

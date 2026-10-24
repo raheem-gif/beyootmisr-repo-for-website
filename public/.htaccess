@@ -9,8 +9,11 @@ ErrorDocument 404 /404.html
   AddType application/manifest+json .webmanifest
 </IfModule>
 
+# AddOutputFilterByType needs mod_filter as well (Apache 2.4); without it the line itself is a 500 error.
 <IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/html text/css application/javascript image/svg+xml application/json application/xml text/plain
+  <IfModule mod_filter.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript image/svg+xml application/json application/xml text/plain
+  </IfModule>
 </IfModule>
 
 <IfModule mod_expires.c>

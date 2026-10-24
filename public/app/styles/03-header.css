@@ -4,11 +4,20 @@
   position: sticky;
   inset-block-start: 0;
   z-index: 100;
+  border-block-end: 1px solid transparent;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+/* The frosted background lives on a pseudo-element: backdrop-filter on the header
+   itself would make it the containing block of the fixed mobile drawer (.main-nav),
+   which then shrinks to the header's height instead of filling the viewport. */
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background: rgba(255, 255, 255, 0.94);
   -webkit-backdrop-filter: saturate(160%) blur(10px);
   backdrop-filter: saturate(160%) blur(10px);
-  border-block-end: 1px solid transparent;
-  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 .site-header.is-scrolled { border-color: var(--line); box-shadow: 0 6px 24px -18px rgba(18, 42, 61, 0.5); }
 .site-header__inner {
@@ -20,20 +29,29 @@
 
 /* Brand */
 .brand { display: inline-flex; align-items: center; gap: 0.6rem; flex: none; color: var(--ink); text-decoration: none; }
+/* Uploaded logo: any aspect ratio fits — the brand shrinks before the menu button is pushed off-screen. */
+.brand--image { display: block; flex: 0 1 auto; min-inline-size: 0; }
 .brand:hover { color: var(--ink); }
 .brand-mark { inline-size: 40px; block-size: 40px; }
 .brand-text { display: grid; line-height: 1.2; }
 .brand-text strong { font-size: 1.2rem; font-weight: 800; color: var(--blue); }
 .brand-text small { font-size: 0.78rem; font-weight: 700; color: var(--amber); }
-.brand--image img { block-size: 48px; inline-size: auto; }
+.brand--image img { inline-size: auto; max-inline-size: min(100%, 240px); block-size: auto; max-block-size: 48px; }
 @media (min-width: 1024px) {
   .brand-mark { inline-size: 46px; block-size: 46px; }
   .brand-text strong { font-size: 1.35rem; }
   .brand-text small { font-size: 0.82rem; }
-  .brand--image img { block-size: 56px; }
+  .brand--image img { max-inline-size: min(100%, 280px); max-block-size: 56px; }
 }
 @media (max-width: 639px) { .site-header .brand-text small { display: none; } }
-@media (max-width: 399px) { .site-header .brand-text { display: none; } }
+@media (max-width: 419px) {
+  .site-header .brand { gap: 0.4rem; }
+  .site-header .brand-mark { inline-size: 34px; block-size: 34px; }
+  .site-header .brand-text strong { font-size: 1.05rem; }
+  .header-actions { gap: 0.3rem; }
+  .header-actions .header-btn { padding-inline: 0.6em; }
+}
+@media (max-width: 374px) { .site-header .brand-text { display: none; } }
 
 /* Header buttons («تبرع الآن» / «اطلب مساعدة») */
 .header-actions { display: flex; align-items: center; gap: 0.4rem; margin-inline-start: auto; }
@@ -166,7 +184,7 @@
 /* ---------- Desktop navigation (≥ 1280px) ---------- */
 @media (min-width: 1280px) {
   .nav-toggle, .nav-drawer-extra, .nav-list .nav-item--home { display: none; }
-  .main-nav { margin-inline-start: 1rem; min-inline-size: 0; }
+  .main-nav { flex-shrink: 0; margin-inline-start: 1rem; min-inline-size: 0; }
   .nav-list { display: flex; align-items: center; gap: 0.1rem; }
   .nav-item { position: relative; display: flex; align-items: center; }
   .nav-link {
@@ -205,7 +223,7 @@
   }
   .sub-toggle .icon { inline-size: 16px; block-size: 16px; transition: transform 0.2s var(--ease); }
   .sub-toggle:hover { color: var(--blue-700); }
-  .has-sub:hover .sub-toggle .icon, .sub-toggle[aria-expanded="true"] .icon { transform: rotate(180deg); }
+  .has-sub:not(.is-dismissed):hover .sub-toggle .icon, .sub-toggle[aria-expanded="true"] .icon { transform: rotate(180deg); }
 
   .subnav {
     position: absolute;
@@ -223,7 +241,10 @@
     transition: opacity 0.18s var(--ease), transform 0.18s var(--ease), visibility 0s linear 0.18s;
   }
   .subnav::before { content: ""; position: absolute; inset-inline: 0; inset-block-start: -12px; block-size: 12px; }
-  .has-sub:hover > .subnav, .has-sub:focus-within > .subnav, .subnav.is-open {
+  /* Keyboard users open a panel with its toggle button (site.js keeps aria-expanded in
+     sync); :focus-within is only the no-JavaScript fallback. Esc or the toggle adds
+     .is-dismissed, which hides a hovered panel until the pointer leaves the item. */
+  .has-sub:not(.is-dismissed):hover > .subnav, html:not(.js) .has-sub:focus-within > .subnav, .subnav.is-open {
     opacity: 1;
     visibility: visible;
     transform: none;
