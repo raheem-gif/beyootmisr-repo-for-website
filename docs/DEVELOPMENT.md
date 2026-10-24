@@ -1,7 +1,8 @@
 # Beyoot Misr website — developer guide
 
 This document explains how the site is built so it can be maintained and extended.
-For hosting/upload steps see the main `README.md`.
+For hosting/upload steps see the main `README.md`; for the admin panel (editor guide
+and first-run setup) see [`ADMIN.md`](ADMIN.md).
 
 ## Architecture in one paragraph
 
@@ -23,7 +24,7 @@ public/                     ← upload the CONTENTS of this folder to the web ro
   activities/*.html         ← one page per activity (generated)
   projects/*.html           ← one page per published project (generated)
   stories/*.html            ← one page per published story (generated)
-  assets/css/site.css       ← generated bundle of app/styles/*.css
+  assets/css/*.css          ← generated, minified bundles of app/styles/*.css (core.css + one per page stylesheet)
   assets/js/site.js         ← generated bundle of app/scripts/*.js
   assets/fonts, assets/img  ← Cairo font (OFL), favicon, OG image
   uploads/images, reports   ← files uploaded through the admin panel
@@ -35,23 +36,40 @@ public/                     ← upload the CONTENTS of this folder to the web ro
     templates/layout.php    ← <html> shell (head, header, footer, WhatsApp button)
     templates/partials/     ← header.php, footer.php
     templates/pages/*.php   ← one template per page type
-    styles/*.css            ← CSS sources, concatenated in name order
+    styles/*.css            ← CSS sources: 00–09 = shared core, 10+ = one file per page (see Build)
     scripts/*.js            ← JS sources, concatenated in name order
-    content/*.json          ← ALL editable content (see below)
+    content/*.json.php      ← ALL editable content, as guarded JSON (see below)
+    admin/                  ← admin panel libraries (sections/, security, uploads, store…)
     storage/                ← runtime data (admin users, logs, backups) — never commit
 ```
 
 ## Content files (`app/content`)
 
+Each file is **guarded JSON**: `<name>.json.php` whose first line is `<?php exit; ?>`
+followed by the JSON. Requested over HTTP it runs as PHP and returns nothing, so
+unpublished drafts never leak even on hosts that ignore `.htaccess`. Read and write
+them only through `bm_json_read()` / `bm_json_write()` / `bm_content()` (they handle the
+guard line); a legacy plain `<name>.json` is still read and is replaced by the guarded
+file on the next admin save. Below, names are given without the `.json.php` suffix.
+
 | File | What it holds |
 |---|---|
-| `texts.json` | Every piece of copy on the site, grouped by page. Taken word-for-word from the content document (PDF). Keys starting with `_` (e.g. `_label`) are metadata for the admin panel, not shown on the site. Strings may contain placeholders: `{hotline}`, `{whatsapp_general}`, `{whatsapp_legal}`, `{registration_number}`, `{registration_year}`, `{year}` — filled from `settings.json`. |
-| `settings.json` | Contact numbers, address, email, social links, legal identity, donation methods, site URL, logo. Empty fields are hidden on the site. |
-| `stats.json` | «أثرنا بالأرقام» numbers. A number is shown **only** when it has a value **and** `updated_at` is set (verified & dated, §02/§08). Otherwise the card reads «يُعلن بعد التوثيق». |
-| `projects.json` | Projects (status `ongoing`=جارٍ / `done`=منجز, location, images, stage updates…). Only `published: true` projects get a page. Cost/donations are shown only when `show_financials` is true. |
-| `stories.json` | Impact stories (types: treatment, livelihood, roof, success, mosque). Only published stories get a page. |
-| `reports.json` | PDF reports (title, year, file path in `uploads/reports`). |
-| `galleries.json` | Photo galleries per activity slug. |
+| `texts` | Every piece of copy on the site, grouped by page. Taken word-for-word from the content document (PDF). Keys starting with `_` (e.g. `_label`) are metadata for the admin panel, not shown on the site. Strings may contain placeholders: `{hotline}`, `{whatsapp_general}`, `{whatsapp_legal}`, `{registration_number}`, `{registration_year}`, `{year}` — filled from `settings.json`. |
+| `settings` | Contact numbers, address, email, social links, legal identity, donation methods, site URL, logo. Empty fields are hidden on the site. |
+| `stats` | «أثرنا بالأرقام» numbers. A number is shown **only** when it has a value **and** `updated_at` is set (verified & dated, §02/§08). Otherwise the card reads «يُعلن بعد التوثيق». |
+| `projects` | Projects (status `ongoing`=جارٍ / `done`=منجز, location, images, stage updates…). Only `published: true` projects get a page. Cost/donations are shown only when `show_financials` is true. |
+| `stories` | Impact stories (types: treatment, livelihood, roof, success, mosque). Only published stories get a page. |
+| `reports` | PDF reports (title, year, file path in `uploads/reports`). |
+| `galleries` | Photo galleries per activity slug. |
+
+Hand-edited files are forgiving: every known field is given the type of its default
+(`bm_typed()` in `lib/data.php`), so a `null` or a number in a text field renders as text
+instead of failing the whole build.
+
+`app/lib/texts-defaults.json.php` exists only on servers updated with the code-update zip
+(`tools/package.sh` writes it from `texts.json`). `bm_content('texts')` fills keys the server's
+`texts.json` lacks from it, so copy added by a new template is never blank; server edits win
+and lists are taken whole.
 
 Image records look like `{"src": "uploads/images/abc.jpg", "thumb": "uploads/images/abc-640.jpg", "w": 1600, "h": 1067, "alt": "…", "caption": "…"}`.
 
@@ -75,6 +93,9 @@ Image records look like `{"src": "uploads/images/abc.jpg", "thumb": "uploads/ima
   with an `<h2 id>`.
 * Data-driven sections must have an honest empty state (no fake numbers, no
   stock photos — content document §08, §12).
+* Whether donating is possible: use `bm_can_donate()` / `bm_donation_methods()`
+  (`lib/data.php`) so every page agrees (only titled methods with details or an
+  official `https://` link count).
 
 ## CSS conventions
 
@@ -85,7 +106,11 @@ Image records look like `{"src": "uploads/images/abc.jpg", "thumb": "uploads/ima
   Brand colours come from the PDF: blue `#1984C0`, amber `#EFA927`, ink `#122A3D`, slate `#5A6772`.
   For small blue text on white use `--blue-700` (contrast 5.3:1). Never put white text on amber.
 * Page-specific CSS goes in its own file (`styles/2X-<page>.css`) and is scoped
-  under the body class `.tpl-<template-name>`.
+  under the body class `.tpl-<template-name>`. Scoping is required: each page only
+  loads the page stylesheets that mention its `.tpl-<name>` class (see Build).
+* Focus: `:focus-visible` draws `var(--focus-ring)` (dark blue, visible on white and
+  next to amber buttons). A dark section sets `--focus-ring: var(--amber)` — the list
+  is in `01-base.css`.
 * Breakpoints: 560, 640, 720, 900/960, 1024, 1280 (desktop navigation).
 * Respect `prefers-reduced-motion`.
 
@@ -101,6 +126,26 @@ php -S 127.0.0.1:8080 -t public     # preview at http://127.0.0.1:8080/
 The build writes files only when their content changed, bundles CSS/JS with a
 content hash in the URL (cache-busting), writes `robots.txt`, and writes
 `sitemap.xml` + canonical URLs once `settings.site_url` is set.
+
+CSS is split so a page downloads only what it uses: `styles/00–09-*.css` form
+`assets/css/core.css` (every page); every other `styles/NN-<name>.css` becomes
+`assets/css/<name>.css`, linked by the template `<name>` and by every template whose
+`.tpl-<template>` class appears in it (`20-about.css` → about and charter). Bundles are
+minified (comments and whitespace only). Stale bundles and stale project/story pages
+(unpublished or deleted) are removed by the build.
+
+## Verification
+
+```bash
+php public/app/build.php --strict                         # 0 warnings expected
+python3 -I tools/check-links.py public                    # internal links and #anchors
+python3 -I tools/check-content.py docs/content-source.txt public   # every public line of the PDF is on the site
+bash tests/admin/run.sh /tmp/bm-admin-sandbox 8095        # admin unit + HTTP tests on a throwaway copy
+node tools/check-ui.js <node_modules with playwright> http://127.0.0.1:8080   # drawer, menus, WhatsApp, lightbox, overflow
+```
+
+`docs/content-source.txt` is the client's content document as extracted text (each line
+tagged with its colour in the PDF: BLUE headings, ink body, gray developer notes).
 
 ## PHP compatibility
 

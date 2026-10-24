@@ -60,7 +60,12 @@ stories and photos edited in the admin). To deploy a new version of the code wit
 overwriting that content:
 
 1. Upload **`dist/beyoot-misr-code-update.zip`** to `public_html` and extract it
-   (it excludes `app/content`, `uploads`, `app/storage` and the generated pages).
+   (it excludes `app/content`, `uploads`, `app/storage`, the generated pages and the root
+   `.htaccess` — so a `.htaccess` you deleted because of a 500 error is not brought back;
+   if you do use it, copy changes from `public/.htaccess` by hand).
+   It includes the current default texts (`app/lib/texts-defaults.json.php`): a text that a
+   new version adds appears with the document's wording until you edit it; texts already
+   edited in the admin are never replaced.
 2. In the admin dashboard press **«إعادة بناء الموقع»** to regenerate all pages.
 
 Use **نسخة احتياطية** in the admin panel to download a backup (content + uploads) before any update.
@@ -79,9 +84,12 @@ Use **نسخة احتياطية** in the admin panel to download a backup (conte
 | تدقيق محتوى الأنشطة والتأكد من أن المساعدات الموصوفة متاحة بالفعل | Admin → النصوص → أنشطتنا العشرة |
 
 Also pending in the document and therefore not shown yet: official email, social links,
-message hours, detailed address, official logo file, real photos, and the status/photos of
-the example project «مسجد سيدنا عيسى ابن مريم — الطور، جنوب سيناء» (shown as **جارٍ**,
-never as completed until proven, per §08).
+message hours, detailed address, official logo file, real photos, and the documentation of
+the example project «مسجد سيدنا عيسى ابن مريم — الطور، جنوب سيناء». The document lists it as
+«مثال على مشروع قابل للعرض بعد التوثيق», so it ships as an **unpublished draft** (status
+**جارٍ**, never «منجز» until proven, per §08): in Admin → المشروعات add its last-update date
+and at least one approved photo or stage, then tick «منشور».
+Pages of projects/stories that are unpublished or deleted are removed at the next build.
 
 ## 4. How the site maps to the content document
 
@@ -107,12 +115,15 @@ nothing is sent to or stored on the server. No cookies, no trackers, no third-pa
 
 ## 5. Development
 
-See [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) for the architecture and conventions.
+See [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) for the architecture, conventions and
+verification commands, and [`docs/ADMIN.md`](docs/ADMIN.md) for the admin panel.
 
 ```bash
 php public/app/build.php --strict          # regenerate all pages from templates + content
 php -S 127.0.0.1:8080 -t public            # preview at http://127.0.0.1:8080/
 python3 tools/check-links.py public        # internal links/anchors
+python3 tools/check-content.py docs/content-source.txt public   # PDF copy is all on the site
+bash tests/admin/run.sh /tmp/bm-sandbox 8095                    # admin test suite (throwaway copy)
 tools/package.sh                           # build + checks + dist/*.zip
 ```
 
