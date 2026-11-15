@@ -6,10 +6,21 @@
     <div class="orbs" aria-hidden="true">
         <div class="orb orb-blue" style="width:520px;height:520px;inset-block-start:-120px;inset-inline-end:-140px"></div>
         <div class="orb orb-deep" style="width:420px;height:420px;inset-block-start:260px;inset-inline-start:-160px"></div>
+        <div class="orb orb-cyan" style="width:380px;height:380px;inset-block-start:420px;inset-inline-end:30%"></div>
         <div class="orb orb-sky" style="width:560px;height:560px;inset-block-start:900px;inset-inline-end:10%"></div>
+        <div class="orb orb-indigo" style="width:440px;height:440px;inset-block-start:1200px;inset-inline-start:30%"></div>
+        <div class="orb orb-cyan" style="width:420px;height:420px;inset-block-start:2000px;inset-inline-end:20%"></div>
         <div class="orb orb-blue" style="width:460px;height:460px;inset-block-start:1500px;inset-inline-start:-120px"></div>
         <div class="orb orb-slate" style="width:520px;height:520px;inset-block-start:2300px;inset-inline-end:-160px"></div>
         <div class="orb orb-deep" style="width:480px;height:480px;inset-block-start:2900px;inset-inline-start:20%"></div>
+    </div>
+
+    {{-- Floating glass bubbles --}}
+    <div class="absolute inset-x-0 top-0 h-[900px] -z-[1] overflow-hidden pointer-events-none" aria-hidden="true">
+        <div class="bubble" style="width:130px;height:130px;inset-block-start:30px;inset-inline-end:-50px"></div>
+        <div class="bubble hidden lg:block" style="width:44px;height:44px;inset-block-start:380px;inset-inline-start:56%;animation-delay:-3s"></div>
+        <div class="bubble" style="width:180px;height:180px;inset-block-start:560px;inset-inline-start:-60px;animation-delay:-5s"></div>
+        <div class="bubble hidden md:block" style="width:70px;height:70px;inset-block-start:620px;inset-inline-start:40%;animation-delay:-1s"></div>
     </div>
 
     {{-- Hero: one line with one accent phrase, the request sheet beside it. --}}
@@ -18,7 +29,7 @@
             <x-flash />
             <h1 class="text-[36px] leading-[1.2] md:text-[56px] md:leading-[1.15] font-semibold tracking-normal">
                 {{ __('site.home.hero_line') }}
-                <span class="text-accent">{{ __('site.home.hero_accent') }}</span>
+                <span class="shimmer-text">{{ __('site.home.hero_accent') }}</span>
             </h1>
             <p class="mt-5 text-lg md:text-xl text-ink-2 max-w-2xl">{{ __('site.home.hero_sub') }}</p>
 

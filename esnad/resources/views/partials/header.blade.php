@@ -1,5 +1,5 @@
-<header class="sticky top-0 z-40 glass-bar" x-data="dialog">
-    <div class="container-page flex items-center gap-4 h-16">
+<header class="sticky top-0 z-40 pt-3 px-3" x-data="dialog">
+    <div class="glass-nav max-w-[1200px] mx-auto flex items-center gap-4 h-16 ps-5 pe-3">
         <a href="{{ route('home') }}" class="shrink-0" aria-label="{{ __('site.home_link') }}"><x-logo :height="28" /></a>
 
         <nav class="hidden lg:flex items-center gap-1 ms-4" aria-label="{{ __('site.menu') }}">
