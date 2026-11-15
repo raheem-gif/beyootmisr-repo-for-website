@@ -1,0 +1,12 @@
+User-agent: *
+Disallow: /admin
+Disallow: /install
+Disallow: /ar/account
+Disallow: /en/account
+Disallow: /ar/sign-in
+Disallow: /en/sign-in
+Disallow: /ar/welcome
+Disallow: /en/welcome
+Disallow: /ar/design
+Disallow: /en/design
+Disallow: /*?*

@@ -1,0 +1,251 @@
+@import 'tailwindcss';
+
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* ------------------------------------------------------------------
+   Fonts. Self-hosted, already subset by Fontsource to Arabic and Latin
+   ranges. Two weights are preloaded in the layout (400 and 600).
+------------------------------------------------------------------- */
+@font-face { font-family: 'Plex Arabic'; font-style: normal; font-weight: 400; font-display: swap; src: url('../fonts/ibm-plex-sans-arabic-arabic-400-normal.woff2') format('woff2'); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC2-10EC4, U+10EFC-10EFF, U+1EE00-1EEFF; }
+@font-face { font-family: 'Plex Arabic'; font-style: normal; font-weight: 500; font-display: swap; src: url('../fonts/ibm-plex-sans-arabic-arabic-500-normal.woff2') format('woff2'); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: 'Plex Arabic'; font-style: normal; font-weight: 600; font-display: swap; src: url('../fonts/ibm-plex-sans-arabic-arabic-600-normal.woff2') format('woff2'); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: 'Plex Arabic'; font-style: normal; font-weight: 700; font-display: swap; src: url('../fonts/ibm-plex-sans-arabic-arabic-700-normal.woff2') format('woff2'); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: 'Plex Arabic'; font-style: normal; font-weight: 400; font-display: swap; src: url('../fonts/ibm-plex-sans-arabic-latin-400-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Plex Arabic'; font-style: normal; font-weight: 500; font-display: swap; src: url('../fonts/ibm-plex-sans-arabic-latin-500-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Plex Arabic'; font-style: normal; font-weight: 600; font-display: swap; src: url('../fonts/ibm-plex-sans-arabic-latin-600-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Plex Arabic'; font-style: normal; font-weight: 700; font-display: swap; src: url('../fonts/ibm-plex-sans-arabic-latin-700-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Naskh'; font-style: normal; font-weight: 400; font-display: swap; src: url('../fonts/noto-naskh-arabic-arabic-400-normal.woff2') format('woff2'); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: 'Naskh'; font-style: normal; font-weight: 700; font-display: swap; src: url('../fonts/noto-naskh-arabic-arabic-700-normal.woff2') format('woff2'); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+
+/* ------------------------------------------------------------------
+   Design tokens (section 15.2)
+------------------------------------------------------------------- */
+@theme {
+    --font-sans: 'Plex Arabic', ui-sans-serif, system-ui, 'Segoe UI', Tahoma, sans-serif;
+    --font-naskh: 'Naskh', 'Plex Arabic', serif;
+
+    /* Canvas and ink */
+    --color-canvas: #ffffff;
+    --color-band: #faf9f5;
+    --color-ink: #141413;
+    --color-ink-2: #5f5e5a;
+
+    /* Neutral scale with fixed jobs: 100-300 backgrounds, 400-600 borders,
+       900 secondary text, 1000 primary text. */
+    --color-n-100: #f3f3f3;
+    --color-n-200: #eeeeee;
+    --color-n-300: #e2e2e2;
+    --color-n-400: #d4d4d2;
+    --color-n-500: #b9b8b4;
+    --color-n-600: #8f8e8a;
+    --color-n-700: #6f6e6a;
+    --color-n-800: #4b4b4b;
+    --color-n-900: #5f5e5a;
+    --color-n-1000: #141413;
+
+    /* States (Uber Base) */
+    --color-error: #de1135;
+    --color-error-bg: #ffefed;
+    --color-success: #0e8345;
+    --color-success-bg: #eaf6ed;
+    --color-warning: #9f6402;
+    --color-warning-bg: #fff6e0;
+
+    /* One accent. #1F64A8 passes AA on white at 6.09:1. The logo's own
+       blue (#509BDF) and slate (#333C43) are kept for brand artwork only. */
+    --color-accent: #1f64a8;
+    --color-accent-hover: #1a5794;
+    --color-accent-soft: #edf4fb;
+    --color-brand-blue: #509bdf;
+    --color-brand-slate: #333c43;
+
+    /* Radii */
+    --radius-xs: 2px;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+
+    /* Shadows only on floating sheets */
+    --shadow-float-sm: 0 1px 4px rgb(0 0 0 / 0.16);
+    --shadow-float: 0 8px 24px rgb(0 0 0 / 0.16);
+
+    /* Type scale. Arabic sizes are set about 2px larger in [lang=ar]. */
+    --text-xs: 14px;
+    --text-sm: 14px;
+    --text-base: 16px;
+    --text-lg: 18px;
+    --text-xl: 20px;
+    --text-2xl: 24px;
+    --text-3xl: 32px;
+    --text-4xl: 40px;
+    --text-5xl: 56px;
+
+    /* Motion */
+    --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-exit: cubic-bezier(0.64, 0, 0.78, 0);
+    --ease-sheet: cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+
+@layer base {
+    html {
+        -webkit-text-size-adjust: 100%;
+        background: var(--color-canvas);
+        color: var(--color-ink);
+    }
+    body {
+        font-family: var(--font-sans);
+        font-size: 16px;
+        line-height: 1.5;
+        font-feature-settings: 'kern';
+    }
+    html[lang='ar'] body {
+        font-size: 17px;
+        line-height: 1.7;
+        letter-spacing: 0;
+    }
+    h1, h2, h3, h4 {
+        line-height: 1.25;
+        font-weight: 600;
+        text-wrap: balance;
+    }
+    p { text-wrap: pretty; }
+    a { color: inherit; }
+    /* Visible focus everywhere, in the accent colour. */
+    :focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+        border-radius: var(--radius-sm);
+    }
+    ::selection { background: var(--color-accent-soft); }
+    [x-cloak] { display: none !important; }
+}
+
+@utility tabular { font-variant-numeric: tabular-nums; }
+@utility font-legal {
+    font-family: var(--font-naskh);
+    line-height: 1.9;
+}
+/* Mirror directional icons in right-to-left (arrows, chevrons, steppers). */
+@utility flip-rtl {
+    [dir='rtl'] & { transform: scaleX(-1); }
+}
+@utility hairline { border: 1px solid var(--color-n-400); }
+
+@layer components {
+    .container-page {
+        width: 100%;
+        max-width: 1200px;
+        margin-inline: auto;
+        padding-inline: 16px;
+    }
+    @media (min-width: 768px) { .container-page { padding-inline: 32px; } }
+
+    /* Buttons: 44px touch target, 8px radius. Exactly one filled action per band. */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 44px;
+        padding-inline: 20px;
+        border-radius: var(--radius-md);
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 1.2;
+        text-decoration: none;
+        transition: background-color 150ms var(--ease-enter), border-color 150ms var(--ease-enter), color 150ms var(--ease-enter);
+        cursor: pointer;
+        white-space: nowrap;
+    }
+    .btn:disabled, .btn[aria-disabled='true'] { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--color-accent); color: #fff; }
+    .btn-primary:hover { background: var(--color-accent-hover); }
+    .btn-outline { background: #fff; color: var(--color-ink); border: 1px solid var(--color-n-500); }
+    .btn-outline:hover { border-color: var(--color-ink); }
+    .btn-ghost { background: transparent; color: var(--color-ink); }
+    .btn-ghost:hover { background: var(--color-n-100); }
+    .btn-danger { background: var(--color-error); color: #fff; }
+    .btn-sm { min-height: 36px; padding-inline: 12px; font-size: 14px; }
+    .btn-lg { min-height: 52px; padding-inline: 28px; font-size: 18px; }
+    /* The urgent request: near-black pill, so it reads differently from the accent. */
+    .btn-request {
+        background: var(--color-ink);
+        color: #fff;
+        border-radius: 999px;
+    }
+    .btn-request:hover { background: #2b2b29; }
+
+    .link { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    .link:hover { text-decoration-thickness: 2px; }
+
+    /* Inputs */
+    .field-label { display: block; font-weight: 500; margin-block-end: 6px; }
+    .field-hint { color: var(--color-ink-2); font-size: 14px; margin-block-start: 6px; }
+    .field-error { color: var(--color-error); font-size: 14px; margin-block-start: 6px; }
+    .input {
+        display: block;
+        width: 100%;
+        min-height: 48px;
+        padding-inline: 14px;
+        border: 1px solid var(--color-n-500);
+        border-radius: var(--radius-md);
+        background: #fff;
+        font: inherit;
+        color: var(--color-ink);
+        transition: border-color 150ms var(--ease-enter), box-shadow 150ms var(--ease-enter);
+    }
+    .input::placeholder { color: var(--color-n-700); }
+    .input:hover { border-color: var(--color-n-700); }
+    .input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-soft); }
+    .input[aria-invalid='true'] { border-color: var(--color-error); }
+    select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%235f5e5a' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 14px center; padding-inline-end: 40px; }
+    [dir='ltr'] select.input { background-position: right 14px center; }
+    textarea.input { padding-block: 12px; min-height: 120px; }
+
+    .checkbox {
+        inline-size: 20px;
+        block-size: 20px;
+        flex: none;
+        margin-block-start: 3px;
+        accent-color: var(--color-accent);
+    }
+
+    .card { background: #fff; border: 1px solid var(--color-n-400); border-radius: var(--radius-lg); }
+    .badge {
+        display: inline-flex; align-items: center; gap: 4px;
+        min-height: 24px; padding-inline: 8px; border-radius: 999px;
+        font-size: 13px; font-weight: 500; line-height: 1;
+        background: var(--color-n-100); color: var(--color-ink);
+    }
+    .badge-verified { background: var(--color-success-bg); color: var(--color-success); }
+    .badge-accent { background: var(--color-accent-soft); color: var(--color-accent); }
+
+    .alert { border-radius: var(--radius-md); padding: 12px 16px; border: 1px solid; }
+    .alert-info { background: var(--color-accent-soft); border-color: #c7dcf0; }
+    .alert-success { background: var(--color-success-bg); border-color: #b6dfc4; }
+    .alert-error { background: var(--color-error-bg); border-color: #f6c1c7; }
+    .alert-warning { background: var(--color-warning-bg); border-color: #f1d9a0; }
+
+    .skeleton { background: linear-gradient(90deg, var(--color-n-100), var(--color-n-200), var(--color-n-100)); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; border-radius: var(--radius-sm); }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    .sheet { box-shadow: var(--shadow-float); border-radius: var(--radius-xl) var(--radius-xl) 0 0; background: rgb(255 255 255 / 0.92); backdrop-filter: saturate(180%) blur(16px); }
+
+    /* Long legal texts in Naskh */
+    .prose-legal { font-family: var(--font-naskh); line-height: 1.9; max-width: 72ch; }
+    html[lang='en'] .prose-legal { font-family: var(--font-sans); line-height: 1.65; }
+    .prose-legal h2 { font-family: var(--font-sans); font-size: 22px; margin-block: 32px 12px; }
+    .prose-legal h3 { font-family: var(--font-sans); font-size: 18px; margin-block: 24px 8px; }
+    .prose-legal p { margin-block: 0 14px; }
+    .prose-legal ul, .prose-legal ol { margin-block: 0 14px; padding-inline-start: 24px; }
+    .prose-legal ul { list-style: disc; }
+    .prose-legal ol { list-style: decimal; }
+    .prose-legal li { margin-block-end: 6px; }
+    .prose-legal a { color: var(--color-accent); text-decoration: underline; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
