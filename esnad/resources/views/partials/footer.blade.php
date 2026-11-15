@@ -9,7 +9,7 @@
     ]);
     $legal = ['terms', 'client-terms', 'lawyer-terms', 'privacy', 'cookies', 'refunds', 'reviews', 'community', 'fraud', 'dpo', 'legal-aid'];
 @endphp
-<footer class="bg-band border-t border-n-300 mt-24 pb-28 md:pb-0">
+<footer class="glass-bar !border-b-0 border-t border-white/60 mt-24 pb-28 md:pb-0">
     <div class="container-page py-12 grid gap-10 md:grid-cols-12 text-[15px]">
         <div class="md:col-span-5 space-y-4">
             <x-logo :height="28" />
@@ -53,7 +53,7 @@
             </dl>
         </div>
     </div>
-    <div class="border-t border-n-300">
+    <div class="border-t border-white/60">
         <div class="container-page py-4 text-[13px] text-ink-2 flex flex-wrap gap-x-6 gap-y-2 justify-between">
             <p>© {{ now()->year }} {{ $op['company_name'] ?: __('site.footer.company') }}. {{ __('site.footer.rights') }}.</p>
         </div>

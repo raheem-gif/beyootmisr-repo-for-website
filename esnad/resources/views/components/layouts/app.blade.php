@@ -40,7 +40,7 @@
         @include('partials.header', ['other' => $other, 'altUrl' => $altUrl])
     @endunless
 
-    <main id="main" class="flex-1" tabindex="-1">
+    <main id="main" class="flex-1 relative isolate" tabindex="-1">
         {{ $slot }}
     </main>
 

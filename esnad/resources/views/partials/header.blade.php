@@ -1,4 +1,4 @@
-<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-n-300" x-data="dialog">
+<header class="sticky top-0 z-40 glass-bar" x-data="dialog">
     <div class="container-page flex items-center gap-4 h-16">
         <a href="{{ route('home') }}" class="shrink-0" aria-label="{{ __('site.home_link') }}"><x-logo :height="28" /></a>
 
@@ -28,8 +28,8 @@
 
     {{-- Mobile menu --}}
     <div id="mobile-menu" x-cloak x-show="open" class="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="{{ __('site.menu') }}" x-on:keydown.escape.window="hide">
-        <div class="absolute inset-0 bg-black/30" x-on:click="hide"></div>
-        <div x-ref="panel" class="absolute inset-y-0 end-0 w-[min(320px,85vw)] bg-white p-4 flex flex-col gap-1 shadow-float"
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" x-on:click="hide"></div>
+        <div x-ref="panel" class="absolute inset-y-0 end-0 w-[min(320px,85vw)] glass-strong !rounded-none p-4 flex flex-col gap-1 shadow-float"
              x-show="open" x-transition:enter="transition duration-300 ease-[var(--ease-enter)]" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0">
             <div class="flex items-center justify-between mb-4">
                 <x-logo :height="24" />
